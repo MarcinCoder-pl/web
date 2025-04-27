@@ -1,0 +1,7 @@
+# Zablokuj listowanie plików i katalogów
+Options -Indexes
+
+# Chroń pliki .htaccess i .htpasswd (i podobne)
+<FilesMatch "^\.">
+    Require all denied
+    </FilesMatch>
