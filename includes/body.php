@@ -1,5 +1,11 @@
 <body>
     <?php
+    //W pliku, który chcesz chronić, dodaj na górze coś takiego:
+    if (!defined('ACCESS')) {
+    die('Brak dostępu.');
+	}
+	/////////////////////////////
+	
     $structurePath = 'structure/';
     require_once "{$structurePath}header.php";
     require_once "{$structurePath}nav.php";
