@@ -1,0 +1,14 @@
+<body>
+    <?php
+    $structurePath = 'structure/';
+    require_once "{$structurePath}header.php";
+    require_once "{$structurePath}nav.php";
+    require_once "{$structurePath}aside.php";
+    
+    // Przekazanie zmiennej $page do main.php
+    require_once "{$structurePath}main.php";
+    
+    require_once "{$structurePath}footer.php";
+    ?>
+</body>
+</html>
