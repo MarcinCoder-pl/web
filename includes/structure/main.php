@@ -5,7 +5,7 @@
 	}
 	
 // Lista dozwolonych stron
-$allowed_pages = ['home', 'contact'];
+$allowed_pages = ['home', 'contact', 'register_form', 'login_form'];
 
 // Jeśli zmienna $page jest ustawiona i strona jest w dozwolonych stronach
 if (isset($page) && in_array($page, $allowed_pages)) {
