@@ -7,7 +7,7 @@ if (!defined('ACCESS')) {
 <div class="container">
     <h2>Rejestracja</h2>
 <form method="post" action="../tools/authenticate.php">
-    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+    
     
     <label for="username">Login:</label>
     <input type="text" name="username" required>

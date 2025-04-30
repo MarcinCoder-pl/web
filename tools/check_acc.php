@@ -14,33 +14,31 @@ function isAlphanumeric($string) :bool {
 }
 
 // Kodowanie do UTF-8
-function convert_to_utf8($tekst) :string {
-    // Lista kodowań do sprawdzenia
-    $encoding_list = ['UTF-8', 'ISO-8859-1', 'Windows-1250', 'ASCII'];
+function convert_to_utf8($tekst) : string {
 
-    // Wykrycie kodowania
+    $encoding_list = ['UTF-8', 'ISO-8859-1', 'ISO-8859-2', 'Windows-1252', 'ASCII'];
     $detected_encoding = mb_detect_encoding($tekst, $encoding_list, true);
 
     if ($detected_encoding === false) {
-        // Jeśli nie udało się wykryć kodowania, załóżmy najgorsze (np. ISO-8859-1)
         $detected_encoding = 'ISO-8859-1';
     }
 
     if ($detected_encoding !== 'UTF-8') {
-        // Konwertuj tylko jeśli nie jest już w UTF-8
         $tekst = mb_convert_encoding($tekst, 'UTF-8', $detected_encoding);
     }
 
     return $tekst;
 }
 
+
+
 // Oczyszczenie tekstu (do bezpiecznego wyświetlania w HTML)
 function sanitize_for_output($tekst) : string {
     $tekst = convert_to_utf8($tekst); // Upewnij się, że UTF-8
     return htmlspecialchars($tekst, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-}
+}///////////////////////
 
-function isLoginTaken($conn, $login) :bool {
+function isLoginTaken($conn, $login) : bool {
     $check_sql = "SELECT id FROM uzytkownicy WHERE login = ?";
     $check_stmt = $conn->prepare($check_sql);
     $check_stmt->bind_param("s", $login);
@@ -50,3 +48,7 @@ function isLoginTaken($conn, $login) :bool {
     $check_stmt->close();
     return $exists;
 }
+function haszujHaslo($haslo) : string {
+    return password_hash($haslo, PASSWORD_DEFAULT);
+}
+
