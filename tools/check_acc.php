@@ -52,3 +52,4 @@ function haszujHaslo($haslo) : string {
     return password_hash($haslo, PASSWORD_DEFAULT);
 }
 
+

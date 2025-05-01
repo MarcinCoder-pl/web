@@ -2,4 +2,5 @@
 if (!defined('ACCESS')) {
     die('Brak dostępu.');
 }
+
 ?>
