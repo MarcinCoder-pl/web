@@ -1,17 +1,13 @@
 <?php
-if (!defined('ACCESS')) {
-    die('Brak dostępu.');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-function generateCsrfToken() {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+function generateCsrfToken(): string {
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
-
-    $token = bin2hex(random_bytes(32));
-    $_SESSION['csrf_token'] = $token;
-
-    return $token;
+    return $_SESSION['csrf_token'];
 }
 
 function validateCsrfToken($token): bool {
@@ -19,20 +15,15 @@ function validateCsrfToken($token): bool {
         session_start();
     }
 
-    // Sprawdź, czy token jest typu string i nie jest pusty
-    if (!is_string($token) || empty($token)) {
-        return false;
-    }
+    $sessionToken = $_SESSION['csrf_token'] ?? '';
 
-    // Usuń zbędne białe znaki
-    $token = trim($token);
-
-    // CSRF token powinien mieć długość 64 znaków (32 bajty w hexie)
-    if (strlen($token) !== 64) {
-        return false;
-    }
-
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    return is_string($token)
+        && is_string($sessionToken)
+        && !empty($token)
+        && strlen($token) === 64
+        && hash_equals((string)$sessionToken, (string)$token);
 }
 
-?>
+function clearCsrfToken(): void {
+    unset($_SESSION['csrf_token']);
+}

@@ -39,7 +39,7 @@ function sanitize_for_output($tekst) : string {
 }///////////////////////
 
 function isLoginTaken($conn, $login) : bool {
-    $check_sql = "SELECT id FROM uzytkownicy WHERE login = ?";
+    $check_sql = "SELECT id FROM uzytkownicy WHERE login = ? LIMIT 1";
     $check_stmt = $conn->prepare($check_sql);
     $check_stmt->bind_param("s", $login);
     $check_stmt->execute();
