@@ -5,4 +5,4 @@
 	}
 ?>
 <h1>Witamy na stronie głównej!</h1>
-<p>To jest strona główna Twojej witryny.</p>
+<p>To jest strona główna Twojej .</p>

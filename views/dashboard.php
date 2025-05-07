@@ -7,7 +7,7 @@
 	
 if (!isset($_SESSION['username'])) {
     // Jeśli nie, przekierowanie na stronę logowania
-    header('Location: login.php');
+    header('Location: home.php');
     exit;
 }	
 ?>

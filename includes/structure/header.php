@@ -5,3 +5,5 @@
 	}
 ?>
 header
+<p><?= $lang['choose_language'] ?></p>
+<a href="?lang=pl">Polski</a> | <a href="?lang=en">English</a>
