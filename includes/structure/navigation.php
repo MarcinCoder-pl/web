@@ -8,19 +8,19 @@
 <div class="navigation-navs">
 	<nav>
 		<ul>
-			<li><a href="index.php?strona=home">Home</a></li>
-			<li><a href="index.php?strona=download">Download</a></li>
-			<li><a href="index.php?strona=forum">Forum</a></li>
+			<li><a href="index.php?strona=home"><?= $lang['home'] ?></a></li>
+			<li><a href="index.php?strona=download"><?= $lang['download'] ?></a></li>
+			<li><a href="index.php?strona=forum"><?= $lang['forum'] ?></a></li>
 			<li><a href="index.php?strona=shop"><?= $lang['shop'] ?></a></li>
-			<li><a href="index.php?strona=event">Event</a></li>
-			<li><a href="index.php?strona=contact">Contact</a></li>
+			<li><a href="index.php?strona=event"><?= $lang['event'] ?></a></li>
+			<li><a href="index.php?strona=contact"><?= $lang['contact'] ?></a></li>
 	<?php if (!isset($_SESSION['username'])) { ?>
-			<li><a href="index.php?strona=register">Register</a></li>
-			<li><a href="index.php?strona=login">Login</a></li>
+			<li><a href="index.php?strona=register"><?= $lang['create_account'] ?></a></li>
+			<li><a href="index.php?strona=login"><?= $lang['login'] ?></a></li>
 	<?php } 
 	else
 	{	?>
-	<li><a href="index.php?strona=dashboard">Dashboard</a></li>
+	<li><a href="index.php?strona=dashboard"><?= $lang['home'] ?></a></li>
 	<?php } ?>
 
 

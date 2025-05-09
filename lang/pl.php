@@ -1,9 +1,24 @@
 <?php
 $lang = [
     'title' => 'Witamy na naszej stronie!',
-    'hello' => 'Cześć, użytkowniku!',
+    'hello' => 'Witaj, użytkowniku!',
     'choose_language' => 'Wybierz język:',
-    'register' => 'Register',
-    'login' => 'Login',
-    'shop' => 'Sklep'
+////////////
+    'home' => 'Strona główna',
+    'download' => 'Pobierz',
+    'forum' => 'Forum',
+    'shop' => 'Sklep',
+    'event' => 'Wydarzenie',
+    'contact' => 'Kontakt',
+    'create_account' => 'Utwórz konto',
+    'login' => 'Zaloguj się',
+////////////////
+    'messages' => 'Wiadomości',
+    'code_execution' => 'Wykonanie kodu',
+    'privacy_policy' => 'Polityka prywatności',
+    'copyright' => 'Prawa autorskie',
+    'service_agreement' => 'Umowa o świadczenie usług',
+    'about_the_game' => 'O grze',
+    'about_the_developer' => 'O twórcy',
+    'support' => 'Wsparcie'
 ];

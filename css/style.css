@@ -6,6 +6,12 @@ body {
 	flex-direction: column;
 	background: #f0f0f0;
 }
+a {
+    text-decoration: none;
+}
+a hover {
+	text-decoration: none;
+}
 ul {
     list-style: none;       /* usuwa kropki */
     padding: 0;             /* usuwa wcięcie wewnętrzne */
