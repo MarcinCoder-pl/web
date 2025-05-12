@@ -1,0 +1,50 @@
+body {
+	text-align: center;
+	display: flex;
+	justify-content: center; /* poziomo */
+	align-items: center;     /* pionowo */
+	flex-direction: column;
+	background: #f0f0f0;
+}
+a {
+    text-decoration: none;
+}
+a hover {
+	text-decoration: none;
+}
+ul {
+    list-style: none;       /* usuwa kropki */
+    padding: 0;             /* usuwa wcięcie wewnętrzne */
+    margin: 0;              /* usuwa wcięcie zewnętrzne */
+}
+
+ul li {
+    /* nie trzeba dodawać nic więcej, ale możesz wyśrodkować tekst: */
+    text-align: center;     /* jeśli chcesz */
+}
+nav {
+	justify-content: center; /* poziomo */
+	background-color: #fff;
+	padding: 10px;
+}
+.footer-navs {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem; /* odstęp między kolumnami */
+    flex-wrap: wrap; /* pozwala zawijać na małych ekranach */
+        flex: 1;
+    min-width: 200px; /* dla responsywności */
+}
+.navigation-navs {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 1rem; /* odstęp między linkami */
+    justify-content: center; /* wyśrodkowanie */
+}
+
+.navigation-navs li {
+    display: inline; /* lub block – zależnie od potrzeb */
+}
+
