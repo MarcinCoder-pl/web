@@ -5,11 +5,10 @@
 	}
 
 // Dane dostępowe do bazy danych
-$db_host = 'localhost';        // lub adres Twojego serwera
-$db_name = 'loginy_DB';      // zmień na nazwę swojej bazy danych
-$db_user = 'webuser';      // zmień na swojego użytkownika bazy
-$db_password = 'strong_password';  // zmień na swoje hasło
-
+$db_host = 'localhost';        // Adres serwera MySQL
+$db_name = 'db_user_web';      // Nazwa Twojej bazy danych
+$db_user = 'webuser';          // Użytkownik bazy danych
+$db_password = 'haslo123';  // zmień na swoje hasło
 
 
 define('MIN_LENGTH_REGISTER', 5);

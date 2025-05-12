@@ -28,6 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 		}
 		
 		$stmt = $conn->prepare(LOGIN_ACC);
+		if( $stmt === false)
+		{
+			die("ERROR przygotowania zapytania");
+		}
 		$stmt->bind_param("s", $username);
 		if( $stmt->execute() )
 		{
