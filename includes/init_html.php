@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <title><?= $lang['title'] ?></title>
-    
+    <?php $_SESSION['language'] = $current_lang; ?> 
     <link rel="icon" href="image/favicon-32x32.png" type="image/x-icon">
     
     <!-- Opis strony dla wyszukiwarek (SEO) -->

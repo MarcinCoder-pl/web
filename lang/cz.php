@@ -1,5 +1,6 @@
 <?php
 $lang = [
+	'language' => 'cz',
     'title' => 'Vítejte na naší stránce!',
     'hello' => 'Ahoj, uživateli!',
     'choose_language' => 'Vyber jazyk:',
