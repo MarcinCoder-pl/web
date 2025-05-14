@@ -3,7 +3,7 @@ $lang = [
     'title' => 'Welcome to our website!',
     'hello' => 'Hello, user!',
     'choose_language' => 'Choose language:',
-////////////
+
     'home' => 'Home',
     'download' => 'Download',
     'forum' => 'Forum',
@@ -12,7 +12,8 @@ $lang = [
     'contact' => 'Contact',
     'create_account' => 'Create Account',
     'login' => 'Login',
-////////////////
+    'dashboard' => 'dashboard',
+
     'messages' => 'Messages',
     'code_execution' => 'Code Execution',
     'privacy_policy' => 'Privacy Policy',
