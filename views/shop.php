@@ -4,5 +4,7 @@
     die('Brak dostępu.');
 	}
 ?>
+<div class="post-container">
 <h1>SHOP	!</h1>
 <p>S H O P !!.</p>
+</div>

@@ -4,5 +4,7 @@
     die('Brak dostępu.');
 	}
 ?>
+<div class="post-container">
 <h1>EVEnt!</h1>
 <p>Aktualne misje.</p>
+</div>
