@@ -1,17 +1,129 @@
+/* Ogólne resetowanie i font */
 body {
-	text-align: center;
 	display: flex;
 	justify-content: center; /* poziomo */
 	align-items: center;     /* pionowo */
 	flex-direction: column;
-	background: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    text-align: center;
+
 }
+
+/* Styl nagłówka */
+header, nav {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 1rem;
+    border-bottom: 2px solid #00ffe0;
+    box-shadow: 0 4px 20px #00ffe066;
+}
+
+nav a {
+    color: #bb86fc;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #00ffe0;
+}
+
+/* Sekcja powitalna */
+main h1 {
+    font-size: 3rem;
+    color: #00ffe0;
+    margin-top: 2rem;
+}
+
+main p {
+    font-size: 1.2rem;
+    color: #ffffffcc;
+}
+
+/* Karty sekcji dolnej */
+section {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border: 1px solid #00ffe0;
+    border-radius: 12px;
+    width: 250px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px #00ffe055;
+}
+
+.card a {
+    display: block;
+    margin: 0.5rem 0;
+    color: #ff66c4;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.card a:hover {
+    color: #00ffe0;
+}
+
+/* Stopka */
+footer {
+    margin-top: 4rem;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    font-size: 0.9rem;
+    color: #aaa;
+    border-top: 1px solid #00ffe0;
+}
+
+/* Flag and language selector */
+.language-selector {
+    margin-top: 1rem;
+}
+/* Ogólny wygląd linków */
 a {
     text-decoration: none;
+    color: #bb86fc;
+    font-weight: bold;
+    position: relative;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 4px #bb86fc44;
 }
-a hover {
-	text-decoration: none;
+
+/* Efekt po najechaniu */
+a:hover {
+    color: #00ffe0;
+    text-shadow: 0 0 6px #00ffe088;
 }
+
+/* Dodatkowe podkreślenie przy najechaniu */
+a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #bb86fc, #00ffe0);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+a:hover::after {
+    transform: scaleX(1);
+}
+
 ul {
     list-style: none;       /* usuwa kropki */
     padding: 0;             /* usuwa wcięcie wewnętrzne */
@@ -24,7 +136,6 @@ ul li {
 }
 nav {
 	justify-content: center; /* poziomo */
-	background-color: #fff;
 	padding: 10px;
 }
 .footer-navs {
@@ -47,4 +158,44 @@ nav {
 .navigation-navs li {
     display: inline; /* lub block – zależnie od potrzeb */
 }
+.post-container {
+    width: 800px; /* stała szerokość */
+    margin: 40px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.05); /* subtelna przezroczystość */
+    border-radius: 8px;
+    box-shadow: 0 0 10px #00ffe055; /* neonowy cień */
+    line-height: 1.6;
+    border: 1px solid #00ffe0;
+    color: #ffffffcc;
+    word-wrap: break-word; /* łamanie długich słów/linków */
+}
+@media (max-width: 850px) {
+    .post-container {
+        width: 90%;
+    }
+}
+.download-button-wrapper {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
 
+.download-button {
+    display: inline-block;
+    background: linear-gradient(90deg, #00ffe0, #bb86fc);
+    color: #000;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 0 12px #00ffe055, 0 0 24px #bb86fc33;
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.download-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #bb86fc, #bb86fc); /* 00ffe0 */
+    box-shadow: 0 0 20px #00ffe0aa, 0 0 30px #bb86fc88;
+}

@@ -4,4 +4,4 @@
     die('Brak dostępu.');
 	}
 ?>
-	aside
+	Online server Offline

@@ -11,8 +11,9 @@ if (!isset($_SESSION['username'])) {
     exit;
 }	
 ?>
+<div class="post-container">
 <BR>dashboard
-
+</div>
 <!-- Formularz wylogowywania z tokenem CSRF -->
 <form method="post" action="../tools/logout.php">
     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>" >

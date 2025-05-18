@@ -10,13 +10,8 @@ require_once __DIR__ . '/../config/db_config.php';
 // Ustawienie danych wejściowych
 $slug = 'welcome';
 
-// Przykładowy język – powinieneś wcześniej ustawić $lang['language'] gdzieś globalnie
-// Zakładamy że masz coś takiego np. w pliku językowym
-//$lang['language'] = 'pl'; // lub 'en', 'de', itd.
+// Przykładowy język 
 $languageCode = $lang['language'];
-
-// Włącz raportowanie błędów MySQLi
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
     // Połączenie z bazą
@@ -32,18 +27,24 @@ try {
     $stmt->bind_param("ss", $slug, $languageCode);
     $stmt->execute();
     $result = $stmt->get_result();
+    ?>
+    
+    <div class="post-container">
+        <?php
+        if ($post = $result->fetch_assoc()) {
+            echo "<h1>" . htmlspecialchars($post['title']) . "</h1>";
+            echo "<div>" . nl2br(htmlspecialchars($post['content'])) . "</div>";
+        } else {
+            echo "<p>Nie znaleziono posta o slug: <strong>$slug</strong> w języku: <strong>$languageCode</strong>.</p>";
+        }
+        ?>
+    </div>
 
-    // Pobranie posta
-    if ($post = $result->fetch_assoc()) {
-        echo "<h1>" . htmlspecialchars($post['title']) . "</h1>";
-        echo "<div>" . nl2br(htmlspecialchars($post['content'])) . "</div>";
-    } else {
-        echo "<p>Nie znaleziono posta o slug: <strong>$slug</strong> w języku: <strong>$languageCode</strong>.</p>";
-    }
-
+    <?php
     $stmt->close();
     $conn->close();
 
 } catch (Exception $e) {
     echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
 }
+?>

@@ -4,7 +4,7 @@ if (!defined('ACCESS')) {
 }
 require_once __DIR__ . '/../tools/csrf_token.php';
 ?>
-<div class="container">
+<div class="post-container">
     <h2>Rejestracja</h2>
 		<form method="post" action="/../tools/register_user.php">
 

@@ -8,7 +8,7 @@ if(isset($_SESSION['username']) )
 }
 require_once __DIR__ . '/../tools/csrf_token.php';
 ?>
-<div class="container">
+<div class="post-container">
     <h2>Logowanie</h2>
     <form method="post" action="../tools/login_user.php">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
