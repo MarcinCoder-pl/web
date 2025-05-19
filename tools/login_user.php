@@ -4,8 +4,9 @@
         session_start();
     }
    define('ACCESS', true);
-require_once 'csrf_token.php';
-require_once '../config/db_config.php'; 
+require_once __DIR__ . '/csrf_token.php';
+require_once __DIR__ . '/../config/db_config.php'; 
+require_once __DIR__ . '/../config/sql_queries.php'; 
 // DEBUG - pokaż tokeny
 echo "<pre>";
 echo "Token z POST: " . ($_POST['csrf_token'] ?? 'BRAK') . "\n";

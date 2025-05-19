@@ -15,7 +15,7 @@
 	<img src="/../../image/flag/poland.png" alt="Poland Flag" width="32" height="32">
 </a>
 
-<a href="?lang=cz">
+<a href="?lang=cs">
 	<img src="/../../image/flag/czech-republic.png" alt="Czech Republic Flag" width="32" height="32">
 </a>
 

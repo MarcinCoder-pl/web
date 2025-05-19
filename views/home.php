@@ -3,47 +3,43 @@
 if (!defined('ACCESS')) {
     die('Brak dostępu.');
 }
-
-// Połączenie z bazą danych
+// Ładowanie konfiguracji
 require_once __DIR__ . '/../config/db_config.php';
+require_once __DIR__ . '/../config/sql_queries.php';
+require_once __DIR__ . '/../config/database.php';
 
-// Ustawienie danych wejściowych
+// Dane wejściowe
 $slug = 'welcome';
-
-// Przykładowy język 
 $languageCode = $lang['language'];
 
 try {
-    // Połączenie z bazą
-    $conn = new mysqli($db_host, $db_user, $db_password, $db_name);
-    $conn->set_charset('utf8mb4');
+    $db = new Database($db_host, $db_user, $db_password, $db_name);
 
-    // Przygotowanie zapytania
-    if (!defined('GET_POST_BY_SLUG_AND_LANG')) {
-        throw new Exception("Stała GET_POST_BY_SLUG_AND_LANG nie została zdefiniowana.");
+    // Dynamiczne zapytanie
+    if (!defined('GET_POST_WEB_DOWNLOAD')) {
+        throw new Exception("Zapytanie GET_POST_BY_SLUG_AND_LANG nie zostało zdefiniowane.");
     }
 
-    $stmt = $conn->prepare(GET_POST_BY_SLUG_AND_LANG);
-    $stmt->bind_param("ss", $slug, $languageCode);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $result = $db->query(GET_POST_WEB_DOWNLOAD, "ss", [$slug, $languageCode]);
     ?>
-    
+
     <div class="post-container">
-        <?php
-        if ($post = $result->fetch_assoc()) {
-            echo "<h1>" . htmlspecialchars($post['title']) . "</h1>";
-            echo "<div>" . nl2br(htmlspecialchars($post['content'])) . "</div>";
-        } else {
-            echo "<p>Nie znaleziono posta o slug: <strong>$slug</strong> w języku: <strong>$languageCode</strong>.</p>";
-        }
-        ?>
+        <?php if ($post = $result->fetch_assoc()): ?>
+            <h1><?= htmlspecialchars($post['title']) ?></h1>
+            <div class="download-button-wrapper">
+                <a href="files/game_installer_windows.exe" class="download-button" download>
+                    ⬇️ Download Game for Windows
+                </a>
+            </div>
+            <div><?= nl2br(htmlspecialchars($post['content'])) ?></div><a href="#">a</a>
+        <?php else: ?>
+            <p>Nie znaleziono posta o slug: <strong><?= htmlspecialchars($slug) ?></strong>
+            w języku: <strong><?= htmlspecialchars($languageCode) ?></strong>.</p>
+        <?php endif; ?>
     </div>
 
     <?php
-    $stmt->close();
-    $conn->close();
-
+    $db->close();
 } catch (Exception $e) {
     echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
 }

@@ -13,11 +13,11 @@ try {
     $conn = new mysqli($db_host, $db_user, $db_password, $db_name);
     $conn->set_charset('utf8mb4');
 
-    if (!defined('GET_POST_BY_WEBSITE')) {
+    if (!defined('GET_POST_WEB_CONTACT')) {
         throw new Exception("Stała GET_POST_BY_WEBSITE nie została zdefiniowana.");
     }
 
-    $stmt = $conn->prepare(GET_POST_BY_WEBSITE);
+    $stmt = $conn->prepare(GET_POST_WEB_CONTACT);
     $stmt->bind_param("ss", $slug, $languageCode);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -30,13 +30,13 @@ try {
             echo "<p>" . nl2br(htmlspecialchars($post['content'])) . "</p>";
 
             if (!empty($post['wsparcie'])) {
-                echo "<p><strong>" . htmlspecialchars($post['wsparcie']) . ":</strong></p>";
+                echo "<p><strong>" . htmlspecialchars($post['wsparcie']) . "</strong> <a href='mailto:example@example.com'>Napisz do nas</a> </p>";
             }
             if (!empty($post['partnerzy_media'])) {
-                echo "<p><strong>" . htmlspecialchars($post['partnerzy_media']) . ":</strong></p>";
+                echo "<p><strong>" . htmlspecialchars($post['partnerzy_media']) . "</strong> <a href='mailto:example@example.com'>Napisz do nas</a> </p>";
             }
             if (!empty($post['adres_korespondencyjny'])) {
-                echo "<p><strong>" . htmlspecialchars($post['adres_korespondencyjny']) . ":</strong> </p>";
+                echo "<p><strong>" . htmlspecialchars($post['adres_korespondencyjny']) . "</strong> </p>";
             }
         } else {
             echo "<p>Nie znaleziono posta o slug: <strong>$slug</strong> w języku: <strong>$languageCode</strong>.</p>";

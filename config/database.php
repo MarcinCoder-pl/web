@@ -12,13 +12,23 @@ class Database {
         $this->conn->set_charset("utf8mb4");
     }
 
-    public function getPostBySlugAndLang($slug, $lang) {
-        if (!defined('GET_POST_BY_SLUG_AND_LANG')) {
-            throw new Exception("Zapytanie GET_POST_BY_SLUG_AND_LANG nie zostało zdefiniowane.");
+    /**
+     * Uniwersalna metoda do wykonywania zapytań przygotowanych
+     * @param string $query - zapytanie SQL z placeholderami (np. SELECT * FROM posts WHERE slug = ? AND lang = ?)
+     * @param string $paramTypes - typy parametrów (np. "ss" dla dwóch stringów)
+     * @param array $params - wartości do podstawienia
+     * @return mysqli_result|false
+     */
+    public function query($query, $paramTypes = "", $params = []) {
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Błąd przygotowania zapytania: " . $this->conn->error);
         }
 
-        $stmt = $this->conn->prepare(GET_POST_BY_SLUG_AND_LANG);
-        $stmt->bind_param("ss", $slug, $lang);
+        if (!empty($paramTypes) && !empty($params)) {
+            $stmt->bind_param($paramTypes, ...$params);
+        }
+
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();

@@ -7,19 +7,28 @@ require_once __DIR__ . '/../tools/csrf_token.php';
 <div class="post-container">
     <h2>Rejestracja</h2>
 		<form method="post" action="/../tools/register_user.php">
-
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
 
-        <label for="username">Login:</label>
-        <input type="text" name="username" required>
+	<div>
+		<label for="username">Login:</label><br>
+		<input type="text" name="username" required>
+	</div>			
+	
+	<div>			
+		<label for="password">Hasło:</label><br>
+		<input type="password" name="password" required autocomplete="off">	
+	<div>
 
-        <label for="password">Hasło:</label>
-        <input type="password" name="password" required autocomplete="off">
+	<div>
+		<label for="password_confirm">Potwierdź hasło:</label><br>
+        <input type="password" name="password_confirm" required>	
+	</div>
 
 
-        <label for="password_confirm">Potwierdź hasło:</label>
-        <input type="password" name="password_confirm" required>
-
-        <button type="submit" name="register" value="rejestruj">Zarejestruj się</button>
+        <br><button type="submit" name="register" value="rejestruj">Zarejestruj się</button>
     </form>
+    <?php if (isset($_SESSION['error'])): ?>
+    <div class="error-message"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+<?php endif; ?>
+
 </div>

@@ -1,96 +1,98 @@
 <?php
-// Rozpoczynamy sesję
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-echo "Start skryptu<br>";
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
-    echo "Sesja rozpoczęta<br>";
 }
 
 define('ACCESS', true);
 
-require_once '../config/db_config.php'; // Połączenie z bazą danych
-require_once 'validate_form_fields.php';
-require_once 'csrf_token.php';
+require_once __DIR__ . '/../config/db_config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/sql_queries.php';
+require_once __DIR__ . '/validate_form_fields.php';
+require_once __DIR__ . '/csrf_token.php';
+require_once __DIR__ . '/ErrorMessageProvider.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    echo "Odebrano POST<br>";
+$langq = $_SESSION['lang'] ?? $lang['language'];
+echo($_SESSION['lang']);
+$db = new Database($db_host, $db_user, $db_password, $db_name);
+$errorProvider = new ErrorMessageProvider($db, $langq);
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
-    if (validateCsrfToken($token)) {
-        echo "Token CSRF prawidłowy<br>";
+    if (!validateCsrfToken($token)) {
+        $_SESSION['error'] = $errorProvider->getMessage('CSRF_ERROR');
+        header('Location: ../index.php?strona=register');
+        exit;
+    }
 
-        if (isset($_POST['username'], $_POST['password'], $_POST['password_confirm'])) {
-            echo "Odebrano dane użytkownika<br>";
+    if (!isset($_POST['username'], $_POST['password'], $_POST['password_confirm'])) {
+        $_SESSION['error'] = $errorProvider->getMessage('MISSING_FIELDS');
+        header('Location: ../index.php?strona=register');
+        exit;
+    }
 
-            if (
-                strlen($_POST['username']) >= MIN_LENGTH_REGISTER &&
-                strlen($_POST['username']) <= MAX_LENGTH_REGISTER &&
-                strlen($_POST['password']) >= MIN_LENGTH_REGISTER
-            ) {
-                echo "Dane mają odpowiednią długość<br>";
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+    $password_confirm = $_POST['password_confirm'];
 
-                if ($_POST['password'] === $_POST['password_confirm']) {
-                    echo "Hasła się zgadzają<br>";
+    if (
+        strlen($username) < MIN_LENGTH_REGISTER ||
+        strlen($username) > MAX_LENGTH_REGISTER ||
+        strlen($password) < MIN_LENGTH_REGISTER
+    ) {
+        $_SESSION['error'] = $errorProvider->getMessage('INVALID_LENGTH');
+        header('Location: ../index.php?strona=register');
+        exit;
+    }
 
-                    $hashed_pass = haszujHaslo($_POST['password']);
-                    $login = convert_to_utf8($_POST['username']);
+    if ($password !== $password_confirm) {
+        $_SESSION['error'] = $errorProvider->getMessage('PASSWORDS_DO_NOT_MATCH');
+        header('Location: ../index.php?strona=register');
+        exit;
+    }
 
-                    if (isAlphanumeric($login)) {
-                        echo "Login alfanumeryczny<br>";
+    if (!isAlphanumeric($username)) {
+        $_SESSION['error'] = $errorProvider->getMessage('INVALID_CHARS');
+        header('Location: ../index.php?strona=register');
+        exit;
+    }
 
-                        $conn = new mysqli($db_host, $db_user, $db_password, $db_name);
+    $conn = new mysqli($db_host, $db_user, $db_password, $db_name);
+    if ($conn->connect_error) {
+        die("Połączenie nie powiodło się: " . $conn->connect_error);
+    }
 
-                        if ($conn->connect_error) {
-                            die("Połączenie nie powiodło się: " . $conn->connect_error);
-                        }
+    if (isLoginTaken($conn, $username)) {
+        $_SESSION['error'] = $errorProvider->getMessage('USERNAME_TAKEN');
+        $conn->close();
+        header('Location: ../index.php?strona=register');
+        exit;
+    }
 
-                        echo "Połączono z bazą danych<br>";
+    $hashed_pass = haszujHaslo($password);
+    $stmt = $conn->prepare(ADD_ACC);
+    $stmt->bind_param("ss", $username, $hashed_pass);
 
-                        if (!isLoginTaken($conn, $login)) {
-                            echo "Login wolny<br>";
-
-                            $stmt = $conn->prepare(ADD_ACC);
-                            $stmt->bind_param("ss", $login, $hashed_pass);
-
-                            if ($stmt->execute()) {
-                                echo "Rejestracja zakończona sukcesem<br>";
-                                $_SESSION['username'] = $login;
-
-                                setcookie('username', $_SESSION['username'], time() + 3600, "/", false, true);
-                                echo "Przekierowanie na dashboard...<br>";
-                                header('Location: /index.php?strona=dashboard');
-                                exit;
-                            } else {
-                                echo "Błąd przy wykonaniu zapytania SQL<br>";
-                                header('Location: ../index.php?strona=home');
-                                exit;
-                            }
-
-                            $stmt->close();
-                            $conn->close();
-                        } else {
-                            echo "Login jest już zajęty<br>";
-                        }
-                    } else {
-                        echo "Login zawiera niedozwolone znaki<br>";
-                    }
-                } else {
-                    echo "Hasła nie są zgodne<br>";
-                }
-            } else {
-                echo "Długość loginu lub hasła nie jest odpowiednia<br>";
-            }
-        } else {
-            echo "Nie przesłano wymaganych danych<br>";
-        }
+    if ($stmt->execute()) {
+        $_SESSION['username'] = $username;
+        setcookie('username', $username, time() + 3600, "/", false, true);
+        $stmt->close();
+        $conn->close();
+        header('Location: /index.php?strona=dashboard');
+        exit;
     } else {
-        echo "Błąd CSRF tokenu<br>";
+        $_SESSION['error'] = $errorProvider->getMessage('SQL_ERROR');
+        $stmt->close();
+        $conn->close();
+        header('Location: ../index.php?strona=register');
+        exit;
     }
 } else {
-    echo "Brak danych POST<br>";
+    $_SESSION['error'] = $errorProvider->getMessage('NO_POST_DATA');
+    header('Location: ../index.php?strona=register');
+    exit;
 }
