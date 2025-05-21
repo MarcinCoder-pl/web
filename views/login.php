@@ -21,4 +21,7 @@ require_once __DIR__ . '/../tools/csrf_token.php';
 
         <button type="submit" name="login" value="loguj">Zaloguj się</button>
     </form>
+        <?php if (isset($_SESSION['error'])): ?>
+    <div class="error-message"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+<?php endif; ?>
 </div>

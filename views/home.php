@@ -3,24 +3,28 @@
 if (!defined('ACCESS')) {
     die('Brak dostępu.');
 }
-// Ładowanie konfiguracji
+
+// Wczytanie wymaganych plików
 require_once __DIR__ . '/../config/db_config.php';
 require_once __DIR__ . '/../config/sql_queries.php';
 require_once __DIR__ . '/../config/database.php';
 
-// Dane wejściowe
-$slug = 'welcome';
-$languageCode = $lang['language'];
-
 try {
+    // Inicjalizacja bazy danych
     $db = new Database($db_host, $db_user, $db_password, $db_name);
 
-    // Dynamiczne zapytanie
-    if (!defined('GET_POST_WEB_DOWNLOAD')) {
-        throw new Exception("Zapytanie GET_POST_BY_SLUG_AND_LANG nie zostało zdefiniowane.");
+    // Dane wejściowe
+    $slug = 'welcome';
+    $languageCode = $lang['language'];
+
+    // Sprawdzenie, czy zapytanie zostało zdefiniowane
+    if (!defined('GET_POST_WEB_HOME')) {
+        throw new Exception("Zapytanie GET_POST_WEB_DOWNLOAD nie zostało zdefiniowane.");
     }
 
-    $result = $db->query(GET_POST_WEB_DOWNLOAD, "ss", [$slug, $languageCode]);
+    // Wykonanie zapytania przy użyciu metody prepareAndExecute()
+    $result = $db->prepareAndExecute(GET_POST_WEB_DOWNLOAD, [$slug, $languageCode]);
+
     ?>
 
     <div class="post-container">
@@ -31,7 +35,7 @@ try {
                     ⬇️ Download Game for Windows
                 </a>
             </div>
-            <div><?= nl2br(htmlspecialchars($post['content'])) ?></div><a href="#">a</a>
+            <div><?= nl2br(htmlspecialchars($post['content'])) ?></div>
         <?php else: ?>
             <p>Nie znaleziono posta o slug: <strong><?= htmlspecialchars($slug) ?></strong>
             w języku: <strong><?= htmlspecialchars($languageCode) ?></strong>.</p>
@@ -39,7 +43,6 @@ try {
     </div>
 
     <?php
-    $db->close();
 } catch (Exception $e) {
     echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
 }

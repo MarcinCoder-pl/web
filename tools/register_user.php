@@ -16,8 +16,7 @@ require_once __DIR__ . '/validate_form_fields.php';
 require_once __DIR__ . '/csrf_token.php';
 require_once __DIR__ . '/ErrorMessageProvider.php';
 
-$langq = $_SESSION['lang'] ?? $lang['language'];
-echo($_SESSION['lang']);
+$langq =  $_SESSION['language'];
 $db = new Database($db_host, $db_user, $db_password, $db_name);
 $errorProvider = new ErrorMessageProvider($db, $langq);
 
@@ -66,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Połączenie nie powiodło się: " . $conn->connect_error);
     }
 
-    if (isLoginTaken($conn, $username)) {
+    if ($db->isLoginTaken($username)) {
         $_SESSION['error'] = $errorProvider->getMessage('USERNAME_TAKEN');
         $conn->close();
         header('Location: ../index.php?strona=register');

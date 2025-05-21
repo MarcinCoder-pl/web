@@ -29,25 +29,13 @@ function convert_to_utf8($tekst) : string {
 
     return $tekst;
 }
-
-
-
 // Oczyszczenie tekstu (do bezpiecznego wyświetlania w HTML)
 function sanitize_for_output($tekst) : string {
     $tekst = convert_to_utf8($tekst); // Upewnij się, że UTF-8
     return htmlspecialchars($tekst, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }///////////////////////
 
-function isLoginTaken($conn, $login) : bool {
-    $check_sql = "SELECT id FROM uzytkownicy WHERE login = ? LIMIT 1";
-    $check_stmt = $conn->prepare($check_sql);
-    $check_stmt->bind_param("s", $login);
-    $check_stmt->execute();
-    $check_stmt->store_result();
-    $exists = $check_stmt->num_rows > 0;
-    $check_stmt->close();
-    return $exists;
-}
+
 function haszujHaslo($haslo) : string {
     return password_hash($haslo, PASSWORD_DEFAULT);
 }

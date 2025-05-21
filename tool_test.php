@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost'; // host bazy danych
-$dbname = 'db_user_web'; // nazwa bazy danych
-$user = 'webuser'; // użytkownik bazy danych
-$password = 'haslo123'; // hasło do bazy danych
+$host = 'localhost';       // lub adres serwera bazy danych
+$user = 'nowy_user';       // nazwa użytkownika MySQL
+$password = 'twoje_haslo'; // hasło użytkownika
+$database = 'db_databases';
 
 // Tworzenie połączenia
 try {
