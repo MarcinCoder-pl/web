@@ -1,39 +1,12 @@
 <?php
-define('ACCESS', true);
+require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/get_page_content.php';
 
-// Załaduj konfigurację i potrzebne pliki
-require_once __DIR__ . '/../config/db_config.php';
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/sql_queries.php';
-
-
-// Ustaw domyślny język (można to zmieniać np. przez sesję lub URL)
-$language = $_SESSION['language'];
-
-try {
-    // Połącz z bazą danych
-    $db = new Database($db_host, $db_user, $db_password, $db_name);
-
-    // Pobierz zawartość strony powitalnej
-    $slug = 'welcome';
-    $result = $db->prepareAndExecute(GET_POST_WEB, [$slug, $language]);
-
-    if ($result && $row = $result->fetch_assoc()) {
-        $title = htmlspecialchars($row['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $content = nl2br(htmlspecialchars($row['content'], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-    } else {
-        $title = "Strona główna";
-        $content = "Nie znaleziono zawartości dla tego języka.";
-    }
-
-} catch (Exception $e) {
-    $title = "Błąd";
-    $content = "Wystąpił błąd: " . htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-}
+$slug = 'welcome';
+$page = getPageContent($db, $slug, $language);
 ?>
 
-       <div class="post-container">
-        <h1><?= $title ?></h1>
-        <p><?= $content ?></p>
-    </div>
-
+<div class="post-container">
+    <h1><?= $page['title'] ?></h1>
+    <p><?= $page['content'] ?></p>
+</div>

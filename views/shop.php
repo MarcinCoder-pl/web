@@ -1,4 +1,3 @@
-
 <?php
 define('ACCESS', true);
 
@@ -16,7 +15,7 @@ try {
     $db = new Database($db_host, $db_user, $db_password, $db_name);
 
     // Pobierz zawartość strony powitalnej
-    $slug = 'download';
+    $slug = 'shop';
     $result = $db->prepareAndExecute(GET_POST_WEB, [$slug, $language]);
 
     if ($result && $row = $result->fetch_assoc()) {
@@ -35,11 +34,6 @@ try {
 
        <div class="post-container">
         <h1><?= $title ?></h1>
-                    <div class="download-button-wrapper">
-                <a href="files/game_installer_windows.exe" class="download-button" download>
-                    ⬇️ Download Game for Windows
-                </a>
-            </div>
         <p><?= $content ?></p>
     </div>
 
