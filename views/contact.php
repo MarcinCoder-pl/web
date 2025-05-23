@@ -1,54 +1,38 @@
 <?php
-if (!defined('ACCESS')) {
-    die('Brak dostępu.');
-}
+define('ACCESS', true);
 
+// Załaduj konfigurację i potrzebne pliki
 require_once __DIR__ . '/../config/db_config.php';
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/sql_queries.php';
 
-$slug = 'contact';
-$languageCode = $lang['language']; // np. 'pl', 'cs', 'en'
+
+// Ustaw domyślny język (można to zmieniać np. przez sesję lub URL)
+$language = $_SESSION['language'];
 
 try {
-    $conn = new mysqli($db_host, $db_user, $db_password, $db_name);
-    $conn->set_charset('utf8mb4');
+    // Połącz z bazą danych
+    $db = new Database($db_host, $db_user, $db_password, $db_name);
 
-    if (!defined('GET_POST_WEB_CONTACT')) {
-        throw new Exception("Stała GET_POST_BY_WEBSITE nie została zdefiniowana.");
+    // Pobierz zawartość strony powitalnej
+    $slug = 'welcome';
+    $result = $db->prepareAndExecute(GET_POST_WEB, [$slug, $language]);
+
+    if ($result && $row = $result->fetch_assoc()) {
+        $title = htmlspecialchars($row['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $content = nl2br(htmlspecialchars($row['content'], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    } else {
+        $title = "Strona główna";
+        $content = "Nie znaleziono zawartości dla tego języka.";
     }
 
-    $stmt = $conn->prepare(GET_POST_WEB_CONTACT);
-    $stmt->bind_param("ss", $slug, $languageCode);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    ?>
-
-    <div class="post-container">
-        <?php
-        if ($post = $result->fetch_assoc()) {
-            echo "<h1>" . htmlspecialchars($post['title']) . "</h1>";
-            echo "<p>" . nl2br(htmlspecialchars($post['content'])) . "</p>";
-
-            if (!empty($post['wsparcie'])) {
-                echo "<p><strong>" . htmlspecialchars($post['wsparcie']) . "</strong> <a href='mailto:example@example.com'>Napisz do nas</a> </p>";
-            }
-            if (!empty($post['partnerzy_media'])) {
-                echo "<p><strong>" . htmlspecialchars($post['partnerzy_media']) . "</strong> <a href='mailto:example@example.com'>Napisz do nas</a> </p>";
-            }
-            if (!empty($post['adres_korespondencyjny'])) {
-                echo "<p><strong>" . htmlspecialchars($post['adres_korespondencyjny']) . "</strong> </p>";
-            }
-        } else {
-            echo "<p>Nie znaleziono posta o slug: <strong>$slug</strong> w języku: <strong>$languageCode</strong>.</p>";
-        }
-        ?>
-    </div>
-
-    <?php
-    $stmt->close();
-    $conn->close();
-
 } catch (Exception $e) {
-    echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
+    $title = "Błąd";
+    $content = "Wystąpił błąd: " . htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
 ?>
+
+       <div class="post-container">
+        <h1><?= $title ?></h1>
+        <p><?= $content ?></p>
+    </div>

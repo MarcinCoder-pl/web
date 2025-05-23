@@ -1,46 +1,45 @@
-<?php
-// Zabezpieczenie dostępu
-if (!defined('ACCESS')) {
-    die('Brak dostępu.');
-}
-// Ładowanie konfiguracji
-require_once __DIR__ . '/../config/db_config.php';
-require_once __DIR__ . '/../config/sql_queries.php';
-require_once __DIR__ . '/../config/database.php';
 
-// Dane wejściowe
-$slug = 'download';
-$languageCode = $lang['language'];
+<?php
+define('ACCESS', true);
+
+// Załaduj konfigurację i potrzebne pliki
+require_once __DIR__ . '/../config/db_config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/sql_queries.php';
+
+
+// Ustaw domyślny język (można to zmieniać np. przez sesję lub URL)
+$language = $_SESSION['language'];
 
 try {
+    // Połącz z bazą danych
     $db = new Database($db_host, $db_user, $db_password, $db_name);
 
-    // Dynamiczne zapytanie
-    if (!defined('GET_POST_WEB_DOWNLOAD')) {
-        throw new Exception("Zapytanie GET_POST_BY_SLUG_AND_LANG nie zostało zdefiniowane.");
+    // Pobierz zawartość strony powitalnej
+    $slug = 'download';
+    $result = $db->prepareAndExecute(GET_POST_WEB, [$slug, $language]);
+
+    if ($result && $row = $result->fetch_assoc()) {
+        $title = htmlspecialchars($row['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $content = nl2br(htmlspecialchars($row['content'], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    } else {
+        $title = "Strona główna";
+        $content = "Nie znaleziono zawartości dla tego języka.";
     }
 
-    $result = $db->query(GET_POST_WEB_DOWNLOAD, "ss", [$slug, $languageCode]);
-    ?>
+} catch (Exception $e) {
+    $title = "Błąd";
+    $content = "Wystąpił błąd: " . htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+?>
 
-    <div class="post-container">
-        <?php if ($post = $result->fetch_assoc()): ?>
-            <h1><?= htmlspecialchars($post['title']) ?></h1>
-            <div class="download-button-wrapper">
+       <div class="post-container">
+        <h1><?= $title ?></h1>
+                    <div class="download-button-wrapper">
                 <a href="files/game_installer_windows.exe" class="download-button" download>
                     ⬇️ Download Game for Windows
                 </a>
             </div>
-            <div><?= nl2br(htmlspecialchars($post['content'])) ?></div><a href="#">a</a>
-        <?php else: ?>
-            <p>Nie znaleziono posta o slug: <strong><?= htmlspecialchars($slug) ?></strong>
-            w języku: <strong><?= htmlspecialchars($languageCode) ?></strong>.</p>
-        <?php endif; ?>
+        <p><?= $content ?></p>
     </div>
 
-    <?php
-    $db->close();
-} catch (Exception $e) {
-    echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
-}
-?>

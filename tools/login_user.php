@@ -1,10 +1,10 @@
 <?php
-// Ustawienia debugowania – tylko dla środowiska deweloperskiego!
+// Wyświetlanie błędów tylko w środowisku deweloperskim
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Inicjalizacja sesji
+// Uruchomienie sesji
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -12,27 +12,31 @@ if (session_status() === PHP_SESSION_NONE) {
 // Stała bezpieczeństwa
 define('ACCESS', true);
 
-// Wczytanie konfiguracji i klas
+// Dołączenie plików konfiguracyjnych i funkcjonalnych
 require_once __DIR__ . '/../config/db_config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/sql_queries.php';
 require_once __DIR__ . '/csrf_token.php';
 require_once __DIR__ . '/ErrorMessageProvider.php';
 require_once __DIR__ . '/validate_form_fields.php';
+require_once __DIR__ . '/LoginAttemptStats.php';
+require_once __DIR__ . '/BruteForceProtector.php';
 
-// Ustal język interfejsu
+// Inicjalizacja języka i połączenia z bazą danych
 $lang = $_SESSION['lang'] ?? 'pl';
 $db = new Database($db_host, $db_user, $db_password, $db_name);
 $errorProvider = new ErrorMessageProvider($db, $lang);
+$stats = new LoginAttemptStats($db);
+$protector = new BruteForceProtector($stats);
 
-// Obsługa tylko żądań POST
+// Sprawdzenie metody żądania
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = $errorProvider->getMessage('NO_POST_DATA');
     header('Location: ../index.php?strona=login');
     exit;
 }
 
-// CSRF
+// Walidacja tokena CSRF
 $csrf_token = $_POST['csrf_token'] ?? '';
 if (!validateCsrfToken($csrf_token)) {
     $_SESSION['error'] = $errorProvider->getMessage('CSRF_ERROR');
@@ -40,17 +44,24 @@ if (!validateCsrfToken($csrf_token)) {
     exit;
 }
 
-// Sprawdzenie obecności pól
-if (!isset($_POST['username'], $_POST['password'])) {
+// Sprawdzenie wymaganych pól
+if (empty($_POST['username']) || empty($_POST['password'])) {
     $_SESSION['error'] = $errorProvider->getMessage('MISSING_FIELDS');
     header('Location: ../index.php?strona=login');
     exit;
 }
 
+// Przypisanie i walidacja danych wejściowych
 $username = trim($_POST['username']);
 $password = $_POST['password'];
+$ip = $_SERVER['REMOTE_ADDR'];
 
-// Sprawdzenie długości
+if ($protector->isBlocked($ip, $username)) {
+    $_SESSION['error'] = $errorProvider->getMessage('TOO_MANY_ATTEMPTS');
+    header('Location: ../index.php?strona=login');
+    exit;
+}
+
 if (
     strlen($username) < MIN_LENGTH_REGISTER ||
     strlen($username) > MAX_LENGTH_REGISTER ||
@@ -61,17 +72,16 @@ if (
     exit;
 }
 
-// Sprawdzenie dozwolonych znaków
 if (!isAlphanumeric($username)) {
     $_SESSION['error'] = $errorProvider->getMessage('INVALID_CHARS');
     header('Location: ../index.php?strona=login');
     exit;
 }
 
-// Pobranie połączenia i przygotowanie zapytania
+// Przygotowanie zapytania SQL
 $conn = $db->getConnection();
-
 $stmt = $conn->prepare(LOGIN_ACC);
+
 if (!$stmt) {
     $_SESSION['error'] = $errorProvider->getMessage('SQL_ERROR');
     header('Location: ../index.php?strona=login');
@@ -80,24 +90,32 @@ if (!$stmt) {
 
 $stmt->bind_param("s", $username);
 $stmt->execute();
+$stmt->store_result();
 $stmt->bind_result($hashedPassword);
 
+// Weryfikacja hasła
+$loginSuccess = false;
 if ($stmt->fetch()) {
     if (password_verify($password, $hashedPassword)) {
         $_SESSION['username'] = $username;
-        setcookie('username', $username, time() + 3600, "/", "", false, true); // httpOnly cookie
-        $stmt->close();
-        header('Location: ../index.php?strona=dashboard');
-        exit;
+        setcookie('username', $username, time() + 3600, "/", "", false, true);
+        $loginSuccess = true;
     } else {
-        $stmt->close(); // <- ważne: ZAMKNIJ zanim wywołasz getMessage()
         $_SESSION['error'] = $errorProvider->getMessage('INVALID_CREDENTIALS');
     }
 } else {
-    $stmt->close(); // <- również tutaj
     $_SESSION['error'] = $errorProvider->getMessage('INVALID_CREDENTIALS');
 }
 
-header('Location: ../index.php?strona=login');
+$stmt->close();
+
+// Zapis próby logowania
+$db->prepareAndExecute(
+    "INSERT INTO login_attempts (username, ip_address, success) VALUES (?, ?, ?)",
+    [$username, $ip, $loginSuccess ? 1 : 0]
+);
+
+// Przekierowanie
+header('Location: ../index.php?strona=' . ($loginSuccess ? 'dashboard' : 'login'));
 exit;
 ?>
