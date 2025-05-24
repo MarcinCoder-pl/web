@@ -4,6 +4,17 @@
     die('Brak dostępu.');
 	}
 	require_once __DIR__ . '/../config/lang_config.php'; 
+	
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://fonts.googleapis.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;");
+header("Referrer-Policy: no-referrer");
+// Odkomentuj, gdy masz HTTPS:
+// header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: SAMEORIGIN");
+header("X-XSS-Protection: 1; mode=block");
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="<?= $current_lang ?>">

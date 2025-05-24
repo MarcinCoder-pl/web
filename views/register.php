@@ -7,7 +7,8 @@ require_once __DIR__ . '/../tools/csrf_token.php';
 <div class="post-container">
     <h2>Rejestracja</h2>
 		<form method="post" action="/../tools/register_user.php">
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+        
+        <input type="hidden" name="csrf_token" value="<?= generateCsrfToken(); ?>">
 
 	<div>
 		<label for="username">Login:</label><br>

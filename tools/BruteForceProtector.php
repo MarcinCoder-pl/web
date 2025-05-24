@@ -1,5 +1,4 @@
 <?php
-// Sprawdzenie dostępu
 if (!defined('ACCESS')) {
     die('Brak dostępu.');
 }
@@ -36,5 +35,19 @@ class BruteForceProtector
         $query = "SELECT COUNT(*) AS total FROM login_attempts WHERE username = ? AND success = 0 AND timestamp > (NOW() - INTERVAL ? SECOND)";
         $result = $this->stats->getDb()->prepareAndExecute($query, [$username, $this->lockoutTimeSeconds]);
         return (int)($result->fetch_assoc()['total'] ?? 0) >= $this->maxAttemptsPerUsername;
+    }
+
+    public function getRemainingBlockTime(string $ip, string $username): int
+    {
+        $query = "SELECT MIN(timestamp) AS first_fail FROM login_attempts WHERE (ip_address = ? OR username = ?) AND success = 0 AND timestamp > (NOW() - INTERVAL ? SECOND)";
+        $result = $this->stats->getDb()->prepareAndExecute($query, [$ip, $username, $this->lockoutTimeSeconds]);
+
+        $row = $result->fetch_assoc();
+        if ($row && $row['first_fail']) {
+            $firstFail = strtotime($row['first_fail']);
+            $remaining = ($firstFail + $this->lockoutTimeSeconds) - time();
+            return max(0, $remaining);
+        }
+        return 0;
     }
 }

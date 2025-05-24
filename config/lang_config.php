@@ -8,6 +8,9 @@ $default_lang = 'pl';
 // Zmiana języka przez GET
 if (isset($_GET['lang'])) {
     $lang_code = $_GET['lang'];
+}
+$allowed_langs = ['pl', 'en', 'cs'];
+if (preg_match('/^[a-z]{2}$/', $lang_code) && in_array($lang_code, $allowed_langs)) {
     $_SESSION['lang'] = $lang_code;
 }
 
@@ -21,3 +24,4 @@ if (file_exists($lang_file)) {
 } else {
     include __DIR__ . '/../lang/' . $default_lang . '.php';
 }
+
