@@ -30,6 +30,9 @@ class SessionManager
         $stmt->execute();
         $stmt->close();
 
+        // Usuwa starsze sesje (zostawia tylko 5 najnowszych)
+        $this->deleteOldSessions($userId, 5);
+
         return $sessionToken;
     }
 
@@ -108,21 +111,25 @@ class SessionManager
 
         return $affectedRows > 0;
     }
+
+    // Usuwa stare sesje użytkownika, zostawiając tylko najnowsze (domyślnie 5)
+    public function deleteOldSessions(int $userId, int $limit = 5): void
+    {
+        $sql = "DELETE FROM sessions 
+                WHERE user_id = ? 
+                AND id NOT IN (
+                    SELECT id FROM (
+                        SELECT id FROM sessions WHERE user_id = ? ORDER BY created_at DESC LIMIT ?
+                    ) AS recent_sessions
+                )";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Błąd przygotowania zapytania: " . $this->conn->error);
+        }
+
+        $stmt->bind_param('iii', $userId, $userId, $limit);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
-/*
-// Tworzenie sesji
-$token = $sessionManager->createSession($userId, $ip, $userAgent);
-
-// Pobieranie sesji
-$session = $sessionManager->getSession($token);
-
-// Usuwanie sesji
-$sessionManager->deleteSession($token);
-
-// Usuwanie wszystkich sesji użytkownika
-$sessionManager->deleteSessionsByUser($userId);
-
-// Odświeżanie sesji
-$sessionManager->refreshSession($token);
- * 
- */

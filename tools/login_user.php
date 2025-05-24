@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 define('ACCESS', true);
 require_once __DIR__ . '/SessionManager.php';
-
+require_once __DIR__ . '/AuditLogger.php';
 require_once __DIR__ . '/../config/db_config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/sql_queries.php';
@@ -25,6 +25,7 @@ $sessionManager = new SessionManager($db);
 $errorProvider = new ErrorMessageProvider($db, $lang);
 $stats = new LoginAttemptStats($db);
 $protector = new BruteForceProtector($stats);
+$auditLogger = new AuditLogger($db);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = $errorProvider->getMessage('NO_POST_DATA');
@@ -90,9 +91,12 @@ $stmt->bind_result($userId, $hashedPassword);
 $loginSuccess = false;
 
 if ($stmt->fetch()) {
-    if (password_verify($password, $hashedPassword)) {
+    if (password_verify($password, $hashedPassword)) 
+    {
         session_regenerate_id(true);
         $_SESSION['username'] = $username;
+        $_SESSION['user_id'] = $userId;
+
         setcookie('username', $username, time() + 3600, "/", "", isset($_SERVER['HTTPS']), true);
 
         // Pobierz user agent
@@ -103,7 +107,7 @@ if ($stmt->fetch()) {
         // Zapisz token sesji w $_SESSION i ciasteczku:
         $_SESSION['session_token'] = $token;
         setcookie('session_token', $token, time() + 3600, "/", "", isset($_SERVER['HTTPS']), true);
-
+		$auditLogger->log($userId, 'login', "Zalogowano z IP: {$ip}, User-Agent: {$userAgent}");
         $loginSuccess = true;
     } else {
         $_SESSION['error'] = $errorProvider->getMessage('INVALID_CREDENTIALS');

@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 define('ACCESS', true);
-
+require_once __DIR__ . '/AuditLogger.php';
 require_once __DIR__ . '/../config/db_config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/sql_queries.php';
@@ -19,6 +19,7 @@ require_once __DIR__ . '/ErrorMessageProvider.php';
 $langq = $_SESSION['language'] ?? 'pl';
 $db = new Database($db_host, $db_user, $db_password, $db_name);
 $errorProvider = new ErrorMessageProvider($db, $langq);
+$auditLogger = new AuditLogger($db);
 
 $ip = $_SERVER['REMOTE_ADDR'];
 $username = $_POST['username'] ?? '';
@@ -87,6 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['username'] = $username;
         setcookie('username', $username, time() + 3600, "/", "", false, true);
         $registrationSuccess = true;
+        $userId = $stmt->insert_id;
+            $auditLogger->log($userId, 'register', "Rejestracja z email: {$email}, IP: {$ip}");
     } else {
         $_SESSION['error'] = $errorProvider->getMessage('SQL_ERROR');
     }

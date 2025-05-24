@@ -2,8 +2,17 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+define('ACCESS', true);
+require_once __DIR__ . '/../config/db_config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/csrf_token.php';
+require_once __DIR__ . '/AuditLogger.php';
 
-require_once __DIR__ . '/csrf_token.php';  // Plik z funkcją do generowania i walidacji tokena CSRF
+
+
+// Inicjalizacja bazy danych i loggera audytu
+$db = new Database($db_host, $db_user, $db_password, $db_name);
+$auditLogger = new AuditLogger($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
@@ -11,10 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (validateCsrfToken($token)) {
         $_SESSION['csrf_token'] = 'X';
 
+        // Logowanie audytu (jeśli użytkownik zalogowany)
+        if (isset($_SESSION['user_id'])) {
+            $userId = $_SESSION['user_id'];
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $details = "Wylogowanie z IP: $ip";
+            $auditLogger->log($userId, 'logout', $details);
+        }
+
         // Usuwanie danych sesji
         session_unset();
-
-        // Zniszczenie sesji
         session_destroy();
 
         // Usuwanie ciasteczka sesji z przeglądarki
@@ -26,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
         }
 
-        // (opcjonalne) Usunięcie innych własnych ciasteczek
+        // (opcjonalnie) Usunięcie innych własnych ciasteczek
         setcookie('username', '', time() - 3600, '/');
 
-        // Przekierowanie na stronę logowania lub główną
+        // Przekierowanie na stronę główną
         header('Location: ../index.php?strona=home');
         exit;
     } else {
@@ -38,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Jeśli żądanie nie jest typu POST
+// Jeśli żądanie nie jest POST
 header('Location: ../index.php?strona=home');
 exit;
-?>
