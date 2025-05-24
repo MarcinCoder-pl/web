@@ -1,92 +1,113 @@
 <?php
 // Sprawdzenie, czy plik jest dozwolony do uruchomienia
 if (!defined('ACCESS')) {
-    die('Brak dostępu.'); // Zakończ wykonywanie, jeśli stała ACCESS nie jest zdefiniowana
+    die('Brak dostępu.');
 }
 
 class Database 
 {
-    private $connection; // Zmienna przechowująca połączenie z bazą danych
+    private $connection;
 
     public function __construct($host, $username, $password, $dbname) 
     {
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // Włącz raportowanie błędów jako wyjątki
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
         try {
-            $this->connection = new mysqli($host, $username, $password, $dbname); // Nawiązanie połączenia z bazą danych
-            $this->connection->set_charset("utf8mb4"); // Ustawienie zestawu znaków na utf8mb4
+            $this->connection = new mysqli($host, $username, $password, $dbname);
+            $this->connection->set_charset("utf8mb4");
         } catch (mysqli_sql_exception $e) {
-            throw new Exception("Błąd połączenia z bazą danych: " . $e->getMessage()); // Obsługa błędu połączenia
+            throw new Exception("Błąd połączenia z bazą danych: " . $e->getMessage());
         }
     }
 
     public function setCharset($charset) 
     {
         try {
-            $this->connection->set_charset($charset); // Ustawienie niestandardowego zestawu znaków
+            $this->connection->set_charset($charset);
         } catch (mysqli_sql_exception $e) {
-            throw new Exception("Błąd ustawiania zestawu znaków: " . $e->getMessage()); // Obsługa błędu ustawienia
+            throw new Exception("Błąd ustawiania zestawu znaków: " . $e->getMessage());
         }
     }
 
     public function prepareAndExecute($query, $params = []) 
     {
         try {
-            $stmt = $this->connection->prepare($query); // Przygotowanie zapytania SQL
+            $stmt = $this->connection->prepare($query);
 
             if (!empty($params)) {
-                $types = $this->getParamTypes($params); // Ustalenie typów parametrów
-                $stmt->bind_param($types, ...$params); // Przypisanie parametrów do zapytania
+                $types = $this->getParamTypes($params);
+                $stmt->bind_param($types, ...$params);
             }
 
-            $stmt->execute(); // Wykonanie zapytania
-            $result = $stmt->get_result(); // Pobranie wyniku (jeśli istnieje)
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-            $output = $result ?: true; // Zwraca wynik zapytania SELECT lub true dla INSERT/UPDATE/DELETE
+            $output = $result ?: true;
 
-            $stmt->close(); // Zamknięcie zapytania
+            $stmt->close();
 
-            return $output; // Zwrócenie danych
+            return $output;
         } catch (mysqli_sql_exception $e) {
-            throw new Exception("Błąd wykonania zapytania: " . $e->getMessage()); // Obsługa błędu wykonania
+            throw new Exception("Błąd wykonania zapytania: " . $e->getMessage());
         }
     }
 
     private function getParamTypes($params) 
     {
-        $types = ''; // Łańcuch na typy parametrów
+        $types = '';
         foreach ($params as $param) {
             if (is_int($param)) {
-                $types .= 'i'; // Liczba całkowita
+                $types .= 'i';
             } elseif (is_float($param)) {
-                $types .= 'd'; // Liczba zmiennoprzecinkowa
+                $types .= 'd';
             } else {
-                $types .= 's'; // Tekst (string)
+                $types .= 's';
             }
         }
-        return $types; // Zwrócenie łańcucha typów
+        return $types;
     }
-    
-public function isLoginTaken($username): bool
-{
-    $query = "SELECT COUNT(*) as count FROM uzytkownicy WHERE login = ?";
-    $stmt = $this->connection->prepare($query);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($count);
-    $stmt->fetch();
-    $stmt->close();
 
-    return $count > 0;
-}
+    public function isLoginTaken(string $username): bool
+    {
+        $query = "SELECT COUNT(*) as count FROM users WHERE username = ?";
+        $stmt = $this->connection->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Błąd przygotowania zapytania: " . $this->connection->error);
+        }
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+
+        return $count > 0;
+    }
+
+    public function isEmailTaken(string $email): bool
+    {
+        $query = "SELECT COUNT(*) as count FROM users WHERE email = ?";
+        $stmt = $this->connection->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Błąd przygotowania zapytania: " . $this->connection->error);
+        }
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+
+        return $count > 0;
+    }
+
     public function getConnection()
     {
         return $this->connection;
     }
+
     public function __destruct() 
     {
         if ($this->connection) {
-            $this->connection->close(); // Zamknięcie połączenia z bazą danych przy niszczeniu obiektu
+            $this->connection->close();
         }
     }
 }

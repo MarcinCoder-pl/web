@@ -24,7 +24,7 @@ header("X-XSS-Protection: 1; mode=block");
     <?php $_SESSION['language'] = $current_lang; ?> 
     <link rel="icon" href="image/favicon-32x32.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="css/style.css">
 
     <!-- Opis strony dla wyszukiwarek (SEO) -->
     <meta name="description" content="Krótki opis strony"> 

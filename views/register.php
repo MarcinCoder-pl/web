@@ -24,6 +24,11 @@ require_once __DIR__ . '/../tools/csrf_token.php';
 		<label for="password_confirm">Potwierdź hasło:</label><br>
         <input type="password" name="password_confirm" required>	
 	</div>
+	<div>
+    <label for="email">Email:</label><br>
+    <input type="email" name="email" required>
+</div>
+
 
 
         <br><button type="submit" name="register" value="rejestruj">Zarejestruj się</button>

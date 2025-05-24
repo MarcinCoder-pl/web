@@ -8,6 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 define('ACCESS', true);
+require_once __DIR__ . '/SessionManager.php';
 
 require_once __DIR__ . '/../config/db_config.php';
 require_once __DIR__ . '/../config/database.php';
@@ -20,6 +21,7 @@ require_once __DIR__ . '/BruteForceProtector.php';
 
 $lang = $_SESSION['lang'] ?? 'pl';
 $db = new Database($db_host, $db_user, $db_password, $db_name);
+$sessionManager = new SessionManager($db);
 $errorProvider = new ErrorMessageProvider($db, $lang);
 $stats = new LoginAttemptStats($db);
 $protector = new BruteForceProtector($stats);
@@ -70,8 +72,10 @@ if (!isAlphanumeric($username)) {
     exit;
 }
 
+// Sprawdzenie poświadczeń użytkownika
 $conn = $db->getConnection();
-$stmt = $conn->prepare(LOGIN_ACC);
+$stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE username = ?");
+
 if (!$stmt) {
     $_SESSION['error'] = $errorProvider->getMessage('SQL_ERROR');
     header('Location: ../index.php?strona=login');
@@ -81,26 +85,40 @@ if (!$stmt) {
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($hashedPassword);
+$stmt->bind_result($userId, $hashedPassword);
 
 $loginSuccess = false;
+
 if ($stmt->fetch()) {
     if (password_verify($password, $hashedPassword)) {
         session_regenerate_id(true);
         $_SESSION['username'] = $username;
-        setcookie('username', $username, time() + 3600, "/", "", false, true);
+        setcookie('username', $username, time() + 3600, "/", "", isset($_SERVER['HTTPS']), true);
+
+        // Pobierz user agent
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+        // Tworzymy sesję w bazie:
+        $token = $sessionManager->createSession($userId, $ip, $userAgent);
+
+        // Zapisz token sesji w $_SESSION i ciasteczku:
+        $_SESSION['session_token'] = $token;
+        setcookie('session_token', $token, time() + 3600, "/", "", isset($_SERVER['HTTPS']), true);
+
         $loginSuccess = true;
     } else {
         $_SESSION['error'] = $errorProvider->getMessage('INVALID_CREDENTIALS');
     }
+} else {
+    $_SESSION['error'] = $errorProvider->getMessage('INVALID_CREDENTIALS');
 }
+
 $stmt->close();
 
+// Rejestruj próbę logowania z user_id lub NULL
 $db->prepareAndExecute(
-    "INSERT INTO login_attempts (username, ip_address, success) VALUES (?, ?, ?)",
-    [$username, $ip, $loginSuccess ? 1 : 0]
+    "INSERT INTO login_attempts (user_id, email_or_username, ip_address, success) VALUES (?, ?, ?, ?)",
+    [$loginSuccess ? $userId : null, $username, $ip, $loginSuccess ? 1 : 0]
 );
 
 header('Location: ../index.php?strona=' . ($loginSuccess ? 'dashboard' : 'login'));
 exit;
-?>
