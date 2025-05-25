@@ -1,0 +1,261 @@
+ _________________users_____________________________________________________________________
+| Kolumna              | Typ danych     | Opis                                      		|
+| -------------------- | -------------- | --------------------------------------------------|
+| `id`                 | `INT`          | Unikalny identyfikator (klucz główny)     		|
+| `username`           | `VARCHAR(50)`  | Unikalna nazwa użytkownika                		|
+| `email`              | `VARCHAR(100)` | Unikalny adres e-mail                     		|
+| `password_hash`      | `VARCHAR(255)` | Haszowane hasło użytkownika               		|
+| `first_name`         | `VARCHAR(50)`  | Imię użytkownika (opcjonalne)             		|
+| `last_name`          | `VARCHAR(50)`  | Nazwisko użytkownika (opcjonalne)         		|
+| `created_at`         | `DATETIME`     | Data rejestracji                          		|
+| `updated_at`         | `DATETIME`     | Data ostatniej modyfikacji danych         		|
+| `is_active`          | `TINYINT(1)`   | Czy konto jest aktywne (1 = tak, 0 = nie) 		|
+| `role`               | `VARCHAR(20)`  | Rola użytkownika, np. `user`,`admin`,`vip`		|
+| `email_verified`     | `TINYINT(1)`   | Czy adres e-mail został potwierdzony      		|
+| `verification_token` | `VARCHAR(255)` | Token do weryfikacji e-maila (tymczasowy) 		|
+| `reset_token`        | `VARCHAR(255)` | Token do resetowania hasła                		|
+| `reset_token_expiry` | `DATETIME`     | Data wygaśnięcia tokenu resetowego        		|
+| `avatar_url` 		   | `VARCHAR(255)` | Ścieżka lub URL do zdjęcia profilowego użytkownika|
+|___________________________________________________________________________________________|
+
+ _________sessions________________________________________________________________________________________
+| Kolumna         | Typ danych     | Opis                                                                 |
+| --------------- | -------------- | -------------------------------------------------------------------- |
+| `id`            | `INT`          | Klucz główny sesji                                                   |
+| `user_id`       | `INT`          | ID użytkownika z tabeli `users`                                      |
+| `session_token` | `VARCHAR(255)` | Token sesyjny (np. JWT, UUID)                                        |
+| `ip_address`    | `VARCHAR(45)`  | Adres IP użytkownika                                                 |
+| `user_agent`    | `TEXT`         | Dane o przeglądarce i systemie                                       |
+| `created_at`    | `DATETIME`     | Czas utworzenia sesji                                                |
+| `expires_at`    | `DATETIME`     | Czas wygaśnięcia sesji                                               |
+| FOREIGN KEY     | -              | `user_id` powiązany z `users(id)` – usuwa sesje przy usunięciu konta |
+|_________________________________________________________________________________________________________|
+
+ _______login_attempts___________________________________________________________________________________________
+| Kolumna             | Typ danych     | Opis                                                                    |
+| ------------------- | -------------- | ----------------------------------------------------------------------- |
+| `id`                | `INT`          | Klucz główny                                                            |
+| `user_id`           | `INT`          | Odniesienie do `users.id` (może być NULL jeśli użytkownik nie istnieje) |
+| `email_or_username` | `VARCHAR(100)` | To, co użytkownik wpisał jako login                                     |
+| `success`           | `TINYINT(1)`   | Czy logowanie się powiodło (1 = tak, 0 = nie)                           |
+| `ip_address`        | `VARCHAR(45)`  | Adres IP użytkownika                                                    |
+| `user_agent`        | `TEXT`         | Dane o przeglądarce i systemie                                          |
+| `attempt_time`      | `DATETIME`     | Czas próby logowania                                                    |
+| `error_message`     | `TEXT`         | Wiadomość o błędzie (np. do celów logów, nie użytkownika)               |
+|________________________________________________________________________________________________________________|
+
+ _account_locks____________________________________________________
+| Kolumna     | Typ danych | Opis                                  |
+| ----------- | ---------- | ------------------------------------- |
+| `id`        | `INT`      | Klucz główny                          |
+| `user_id`   | `INT`      | Użytkownik                            |
+| `locked_at` | `DATETIME` | Kiedy zablokowano                     |
+| `unlock_at` | `DATETIME` | Kiedy można odblokować                |
+| `reason`    | `TEXT`     | Powód (np. zbyt wiele prób logowania) |
+|__________________________________________________________________|
+
+____user_settings___________________________________________________________
+| Kolumna        | Typ danych    | Opis                                     |
+| -------------- | ------------- | ---------------------------------------- |
+| `user_id`      | `INT`         | Klucz główny, jednocześnie FK do `users` |
+| `language`     | `VARCHAR(10)` | `pl`, `en`, itd.                         |
+| `dark_mode`    | `TINYINT(1)`  | 0 = jasny, 1 = ciemny                    |
+| `email_notify` | `TINYINT(1)`  | Czy chce otrzymywać powiadomienia e-mail |
+| `timezone`     | `VARCHAR(50)` | Np. `Europe/Warsaw`                      |
+| `created_at`   | `DATETIME`    | Data utworzenia ustawień                 |
+|___________________________________________________________________________|
+
+ ___audit_logs_____________________________________________________________________________
+| Kolumna     | Typ danych     | Opis                                                      |
+| ----------- | -------------- | --------------------------------------------------------- |
+| `id`        | `INT`          | Klucz główny                                              |
+| `user_id`   | `INT`          | Kto wykonał operację                                      |
+| `action`    | `VARCHAR(100)` | Np. `login`, `logout`, `update_profile`, `delete_account` |
+| `details`   | `TEXT`         | Dodatkowe informacje                                      |
+| `created_at`| `DATETIME`     | Data operacji                                             |
+|__________________________________________________________________________________________|
+
+ ___system_messages_______________________________________________________________________
+| Kolumna      | Typ danych     | Opis                                                    |
+| ------------ | -------------- | ------------------------------------------------------- |
+| `id`         | `INT`          | Klucz główny                                            |
+| `user_id`    | `INT`          | Użytkownik, do którego skierowano wiadomość             |
+| `title`      | `VARCHAR(255)` | Tytuł wiadomości (np. „Zmiana hasła”, „Nowy regulamin”) |
+| `message`    | `TEXT`         | Treść wiadomości                                        |
+| `type`       | `VARCHAR(50)`  | Np. `info`, `warning`, `error`, `alert`, `update`       |
+| `is_read`    | `TINYINT(1)`   | Czy użytkownik przeczytał wiadomość                     |
+| `created_at` | `DATETIME`     | Kiedy została wysłana                                   |
+| `read_at`    | `DATETIME`     | Kiedy została przeczytana (NULL jeśli nieprzeczytana)   |
+|_________________________________________________________________________________________|
+
+ ____error_messages________________________________________________________________
+| Kolumna      | Typ danych    | Opis                                              |
+| ------------ | ------------- | ------------------------------------------------- |
+| `id`         | `INT`         | Klucz główny                                      |
+| `error_code` | `VARCHAR(50)` | Unikalny kod błędu, np. `INVALID_CREDENTIALS`     |
+| `context`    | `VARCHAR(50)` | Opcjonalnie: kontekst, np. `registration`, `auth` |
+| `created_at` | `DATETIME`    | Data dodania błędu                                |
+|__________________________________________________________________________________|
+
+ ___error_translations______________________________________________
+| Kolumna         | Typ danych   | Opis                             |
+| --------------- | ------------ | -------------------------------- |
+| `id`            | `INT`        | Klucz główny                     |
+| `error_id`      | `INT`        | FK do `error_messages(id)`       |
+| `language_code` | `VARCHAR(5)` | Kod języka, np. `pl`, `en`, `cs` |
+| `message`       | `TEXT`       | Przetłumaczony komunikat błędu   |
+| `created_at`    | `DATETIME`   | Data dodania tłumaczenia         |
+|___________________________________________________________________|
+
+
+
+
+
+
+MariaDB [user_core]> CREATE TABLE users (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     username VARCHAR(50) NOT NULL UNIQUE,
+    ->     email VARCHAR(100) NOT NULL UNIQUE,
+    ->     password_hash VARCHAR(255) NOT NULL,
+    ->     first_name VARCHAR(50),
+    ->     last_name VARCHAR(50),
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    ->     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    ->     role ENUM('user', 'admin', 'vip') NOT NULL DEFAULT 'user',
+    ->     email_verified TINYINT(1) NOT NULL DEFAULT 0,
+    ->     verification_token VARCHAR(255),
+    ->     reset_token VARCHAR(255),
+    ->     reset_token_expiry DATETIME,
+    ->     avatar_url VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0,605 sec)
+
+MariaDB [user_core]> CREATE TABLE sessions (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     user_id INT UNSIGNED NOT NULL,
+    ->     session_token VARCHAR(255) NOT NULL UNIQUE,
+    ->     ip_address VARCHAR(45),
+    ->     user_agent TEXT,
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     expires_at DATETIME,
+    ->     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    -> );
+Query OK, 0 rows affected (0,330 sec)
+
+MariaDB [user_core]> CREATE TABLE login_attempts (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     user_id INT UNSIGNED,
+    ->     email_or_username VARCHAR(100) NOT NULL,
+    ->     success TINYINT(1) NOT NULL,
+    ->     ip_address VARCHAR(45),
+    ->     user_agent TEXT,
+    ->     attempt_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     error_message TEXT,
+    ->     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    -> );
+Query OK, 0 rows affected (0,274 sec)
+
+MariaDB [user_core]> CREATE TABLE account_locks (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     user_id INT UNSIGNED NOT NULL,
+    ->     locked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     unlock_at DATETIME,
+    ->     reason TEXT,
+    ->     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    -> );
+Query OK, 0 rows affected (0,275 sec)
+
+MariaDB [user_core]> CREATE TABLE user_settings (
+    ->     user_id INT UNSIGNED PRIMARY KEY,
+    ->     language VARCHAR(10) DEFAULT 'en',
+    ->     dark_mode TINYINT(1) NOT NULL DEFAULT 0,
+    ->     email_notify TINYINT(1) NOT NULL DEFAULT 1,
+    ->     timezone VARCHAR(50),
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    -> );
+Query OK, 0 rows affected (0,197 sec)
+
+MariaDB [user_core]> CREATE TABLE audit_logs (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     user_id INT UNSIGNED,
+    ->     action VARCHAR(100) NOT NULL,
+    ->     details TEXT,
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    -> );
+Query OK, 0 rows affected (0,264 sec)
+
+MariaDB [user_core]> CREATE TABLE system_messages (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     user_id INT UNSIGNED NOT NULL,
+    ->     title VARCHAR(255) NOT NULL,
+    ->     message TEXT NOT NULL,
+    ->     type ENUM('info', 'warning', 'error', 'alert', 'update') NOT NULL DEFAULT 'info',
+    ->     is_read TINYINT(1) NOT NULL DEFAULT 0,
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     read_at DATETIME,
+    ->     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    -> );
+Query OK, 0 rows affected (0,225 sec)
+
+MariaDB [user_core]> CREATE TABLE error_messages (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     error_code VARCHAR(50) NOT NULL UNIQUE,
+    ->     context VARCHAR(50),
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    -> );
+Query OK, 0 rows affected (0,232 sec)
+
+MariaDB [user_core]> CREATE TABLE error_translations (
+    ->     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ->     error_id INT UNSIGNED NOT NULL,
+    ->     language_code VARCHAR(5) NOT NULL,
+    ->     message TEXT NOT NULL,
+    ->     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ->     FOREIGN KEY (error_id) REFERENCES error_messages(id) ON DELETE CASCADE,
+    ->     UNIQUE (error_id, language_code)
+    -> );
+
+------------------------------------------
+------------------------------------------
+INSERT INTO error_messages (error_code, context, created_at) VALUES
+('CSRF_ERROR', NULL, NOW()),
+('email_not_found', NULL, NOW()),
+('INVALID_CHARS', NULL, NOW()),
+('INVALID_CREDENTIALS', NULL, NOW()),
+('INVALID_LENGTH', NULL, NOW()),
+('LOGIN_ATTEMPTS_EXCEEDED', NULL, NOW()),
+('MISSING_FIELDS', NULL, NOW()),
+('NO_POST_DATA', NULL, NOW()),
+('PASSWORD_TOO_SHORT', NULL, NOW()),
+('PASSWORDS_DO_NOT_MATCH', NULL, NOW()),
+('reset_link_sent', NULL, NOW()),
+('SESSION_ERROR', NULL, NOW()),
+('SQL_ERROR', NULL, NOW()),
+('TOO_MANY_ATTEMPTS', NULL, NOW()),
+('USER_BLOCKED', NULL, NOW()),
+('USER_DELETED', NULL, NOW()),
+('USER_INACTIVE', NULL, NOW()),
+('USER_NOT_FOUND', NULL, NOW()),
+('USERNAME_INVALID_CHARS', NULL, NOW()),
+('USERNAME_TAKEN', NULL, NOW()),
+('USERNAME_TOO_LONG', NULL, NOW()),
+('USERNAME_TOO_SHORT', NULL, NOW());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

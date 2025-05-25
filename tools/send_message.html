@@ -1,0 +1,14 @@
+<form method="post" action="../tools/send_message.php">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+
+    <label for="receiver_id">Odbiorca:</label>
+    <input type="text" id="receiver_id" name="receiver_id" required>
+
+    <label for="subject">Temat:</label>
+    <input type="text" id="subject" name="subject" required maxlength="255">
+
+    <label for="body">Treść wiadomości:</label>
+    <textarea id="body" name="body" rows="6" required></textarea>
+
+    <button type="submit">Wyślij</button>
+</form>

@@ -22,5 +22,11 @@ $lang = [
     'service_agreement' => 'Umowa o świadczenie usług',
     'about_the_game' => 'O grze',
     'about_the_developer' => 'O twórcy',
-    'support' => 'Wsparcie'
+    
+    'support' => 'Wsparcie',
+    'message' => 'Wiadomosci',
+    'received_messages' => 'Odebrane wiadomości',
+    'sendnok' => 'Nie udało się wysłać wiadomości',
+    'send' => 'Wiadomość została wysłana.',
+    'message_send' => 'Wyślij wiadomość'
 ];

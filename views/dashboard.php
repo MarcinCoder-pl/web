@@ -1,21 +1,30 @@
 <?php
-    //W pliku, który chcesz chronić, dodaj na górze coś takiego:
-    if (!defined('ACCESS')) {
+define('ACCESS', true);
+require_once __DIR__ . '/../tools/csrf_token.php';
+
+session_start();
+
+// Ochrona przed nieautoryzowanym dostępem
+if (!defined('ACCESS')) {
     die('Brak dostępu.');
-	}
-	require_once __DIR__ . '/../tools/csrf_token.php';
-	
+}
+
+// Sprawdzenie czy użytkownik jest zalogowany
 if (!isset($_SESSION['username'])) {
-    // Jeśli nie, przekierowanie na stronę logowania
     header('Location: home.php');
     exit;
-}	
-?>
-<div class="post-container">
-<BR>dashboard
-</div>
-<!-- Formularz wylogowywania z tokenem CSRF -->
-<form method="post" action="../tools/logout.php">
-    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>" >
-    <button type="submit" name="logout" value="logout">Wyloguj się</button>
-</form>
+}
+
+$csrf_token = generateCsrfToken(); // Generowanie tokena CSRF
+
+// Dane do widoku
+$sessionData = $_SESSION;
+$sendStatus = null;
+
+if (isset($_SESSION['wyslalno'])) {
+    $sendStatus = $_SESSION['wyslalno'] === true ? 'ok' : 'nok';
+    unset($_SESSION['wyslalno']); // Czyścimy sesję po wyświetleniu
+}
+
+// Załaduj widok
+require __DIR__ . '/dashboard2.php';

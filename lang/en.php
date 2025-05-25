@@ -22,6 +22,11 @@ $lang = [
     'service_agreement' => 'Service Agreement',
     'about_the_game' => 'About the game',
     'about_the_developer' => 'About the developer',
-    'support' => 'Support'
+    'support' => 'Support',
+    'message' => 'Message',
+    'received_messages' => 'Received messages',
+    'sendnok' => 'Failed to send the message.',
+    'send' => 'The message has been sent.',
+    'message_send' => 'Send message'
 ];
 

@@ -22,5 +22,10 @@ $lang = [
     'service_agreement' => 'Smlouva o poskytování služeb',
     'about_the_game' => 'O hře',
     'about_the_developer' => 'O vývojáři',
-    'support' => 'Podpora'
+    'support' => 'Podpora',
+	'message' => 'Zpráva',
+	'received_messages' => 'Přijaté zprávy',
+	'sendnok' => 'Nepodařilo se odeslat zprávu.',
+	'send' => 'Zpráva byla odeslána.',
+	'message_send' => 'Odeslat zprávu'
 ];

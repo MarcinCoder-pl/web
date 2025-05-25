@@ -8,7 +8,7 @@ if (!defined('ACCESS')) {
     <nav>
         <ul>
             <li><a href="index.php?strona=home&znak=welcome"><?= htmlspecialchars($lang['home']) ?></a></li>
-            <li><a href="index.php?strona=home&znak=download"><?= htmlspecialchars($lang['download']) ?></a></li>
+            <li><a href="index.php?strona=download"><?= htmlspecialchars($lang['download']) ?></a></li>
             <li><a href="index.php?strona=event"><?= htmlspecialchars($lang['event']) ?></a></li>
             <li><a href="index.php?strona=forum"><?= htmlspecialchars($lang['forum']) ?></a></li>
             <li><a href="index.php?strona=shop"><?= htmlspecialchars($lang['shop']) ?></a></li>
