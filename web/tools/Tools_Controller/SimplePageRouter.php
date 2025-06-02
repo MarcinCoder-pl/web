@@ -1,22 +1,28 @@
 <?php
 namespace Tools_Controller;
 
-use Tools_Manager\SessionManager;
 use Tools_Validation\FormValidator;
+use Tools_Controller\LanguageManager;
+
+
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+}
 
 class SimplePageRouter
 {
     private string $defaultPage = 'home';
     private string $viewsPath;
-    private SessionManager $sessionManager;
     private FormValidator $validator;
+    private LanguageManager $languageManager;
 
-    public function __construct(string $viewsPath)
-    {
-        $this->viewsPath = rtrim($viewsPath, '/');
-        $this->sessionManager = new SessionManager();
-        $this->validator = new FormValidator();
-    }
+public function __construct(string $viewsPath, LanguageManager $languageManager)
+{
+    $this->viewsPath = rtrim($viewsPath, '/');
+    $this->validator = new FormValidator();
+    $this->languageManager = $languageManager;
+}
+
 
     public function route(): void
     {
@@ -29,7 +35,7 @@ class SimplePageRouter
                 'required' => true,
                 'pattern' => '/^[a-zA-Z0-9\-_]+$/',
                 'min' => 1,
-                'max' => 3
+                'max' => 20
             ]
         ]);
 
@@ -42,7 +48,7 @@ class SimplePageRouter
         $viewFile = $this->viewsPath . '/' . $cleanSlug . '.php';
 
         if (file_exists($viewFile)) {
-            require $viewFile;
+            $this->renderView($cleanSlug);
         } else {
             $this->renderView('404');
         }
@@ -50,13 +56,13 @@ class SimplePageRouter
 
     private function renderView(string $view): void
     {
+        $languageManager = $this->languageManager;
         $fallbackView = $this->viewsPath . '/404.php';
         $file = $this->viewsPath . '/' . $view . '.php';
-        require file_exists($file) ? $file : $fallbackView;
-    }
 
-    public function getSessionManager(): SessionManager
-    {
-        return $this->sessionManager;
+        // Przekazujemy $languageManager do widoku
+        extract(['languageManager' => $languageManager]);
+
+        require file_exists($file) ? $file : $fallbackView;
     }
 }

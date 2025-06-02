@@ -1,6 +1,9 @@
 <?php
-namespace Tools_Network;
 
+namespace Tools_Network;
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+	}
 
 class ConfigLoader
 {

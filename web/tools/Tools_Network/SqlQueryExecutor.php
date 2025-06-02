@@ -1,6 +1,9 @@
 <?php
-namespace Tools_Network;
 
+namespace Tools_Network;
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+	}
 
 class SqlQueryExecutor
 {
@@ -45,4 +48,18 @@ class SqlQueryExecutor
         $this->db->prepareAndExecute($query, [$newEmail, $id]);
         return $this->db->getConnection()->affected_rows;
     }
+    public function getUserByUsername(string $username): ?array
+{
+    $query = "SELECT * FROM users WHERE username = ?";
+    $result = $this->db->prepareAndExecute($query, [$username]);
+    return $result ? $result->fetch_assoc() : null;
+}
+public function getUserByUsernameOrEmail(string $value): ?array
+{
+    $query = "SELECT * FROM users WHERE email = ? OR username = ?";
+    $result = $this->db->prepareAndExecute($query, [$value, $value]);
+    return $result ? $result->fetch_assoc() : null;
+}
+
+
 }

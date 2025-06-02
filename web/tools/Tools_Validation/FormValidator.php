@@ -1,6 +1,9 @@
 <?php
-namespace Tools_Validation;
 
+namespace Tools_Validation;
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+	}
 class FormValidator
 {
     private InputSanitizer $sanitizer;

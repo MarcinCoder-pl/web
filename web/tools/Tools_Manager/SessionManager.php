@@ -1,18 +1,30 @@
 <?php
 namespace Tools_Manager;
 
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+}
 
 class SessionManager {
+    private static ?SessionManager $instance = null;
+
     private string $sessionName;
     private int $timeout;
 
-    public function __construct(string $sessionName = 'myapp_session', int $timeout = 1800) {
+    private function __construct(string $sessionName = 'myapp_session', int $timeout = 1800) {
         $this->sessionName = $sessionName;
         $this->timeout = $timeout;
 
         if (session_status() === PHP_SESSION_NONE) {
             $this->start();
         }
+    }
+
+    public static function getInstance(string $sessionName = 'myapp_session', int $timeout = 1800): self {
+        if (self::$instance === null) {
+            self::$instance = new self($sessionName, $timeout);
+        }
+        return self::$instance;
     }
 
     public function start(): void {
@@ -28,13 +40,22 @@ class SessionManager {
             ]);
             session_start();
             $this->checkTimeout();
-            $this->resetSessionIfInvalid(); // 🔒 sprawdzenie sesji
+            $this->resetSessionIfInvalid();
         }
     }
 
-    public function set(string $key, mixed $value): void {
-        $_SESSION[$key] = $value;
-    }
+	public function set(string|array $key, mixed $value = null): void {
+		if (is_array($key)) {
+			// Obsługa tablicy: wiele par klucz => wartość
+			foreach ($key as $k => $v) {
+				$_SESSION[$k] = $v;
+			}
+		} else {
+			// Pojedyncza wartość
+			$_SESSION[$key] = $value;
+		}
+	}
+
 
     public function get(string $key): mixed {
         return $_SESSION[$key] ?? null;
@@ -52,10 +73,18 @@ class SessionManager {
         return isset($_SESSION['user_id']);
     }
 
-    public function login(int|string $userId): void {
-        $this->set('user_id', $userId);
-        $this->regenerateSessionId(); // 🔐 ochrona przed session fixation
-    }
+public function login(int|string $userId, string $username = ''): void
+{
+    $this->set([
+        'user_id' => $userId,
+        'username' => $username
+    ]);
+    $this->regenerateSessionId();
+}
+
+
+   
+    ///
 
     public function regenerateSessionId(): void {
         session_regenerate_id(true);
@@ -75,7 +104,6 @@ class SessionManager {
         session_write_close();
     }
 
-    // Przykład bezpiecznego logoutu – CSRF + POST (opcjonalnie)
     public function logoutSecure(string $token, string $action = 'logout'): bool {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $this->validateCsrfToken($action, $token)) {
             $this->logout();
@@ -100,10 +128,6 @@ class SessionManager {
         }
     }
 
-    // =========================
-    // CSRF token handling
-    // =========================
-
     public function generateCsrfToken(string $action): string {
         return AuthToken::generate($action);
     }
@@ -116,18 +140,15 @@ class SessionManager {
         AuthToken::clear($action);
     }
 
-    public function getOrCreateCsrfToken(string $action): string {
-        $token = $this->get('csrf_token_' . $action);
-        if (!$token) {
-            $token = $this->generateCsrfToken($action);
-            $this->set('csrf_token_' . $action, $token);
-        }
-        return $token;
-    }
+			public function getOrCreateCsrfToken(string $action): string {
+				// Jeśli już istnieje i nie wygasł, zwróć
+				if (AuthToken::isTokenValid($action)) {
+					return $_SESSION['csrf_tokens'][$action]['token'];
+				}
 
-    // =========================
-    // Zaawansowana walidacja sesji
-    // =========================
+				// Wygeneruj nowy
+				return $this->generateCsrfToken($action);
+			}
 
     private function isCli(): bool {
         return php_sapi_name() === 'cli' || defined('STDIN');

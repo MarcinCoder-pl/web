@@ -1,6 +1,11 @@
 <?php
+
 namespace Tools_Validation;
 
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+	}
+	
 class InputSanitizer
 {
     /**

@@ -1,5 +1,9 @@
 <?php
 namespace Tools_Manager;
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+	}
+
 
 class AuthToken
 {

@@ -1,0 +1,86 @@
+/* ====== RESET CSS ====== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ====== ZMIENNE ====== */
+:root {
+  --primary-color: #00aced;
+  --secondary-color: #333;
+  --background-light: #ffffff;
+  --text-light: #f5f5f5;
+  --text-dark: #222;
+  --border-color: #ddd;
+}
+
+/* ====== TYPOGRAFIA ====== */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+/* ====== LAYOUT PODSTAWOWY ====== */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* ====== RESPONSYWNOŚĆ ====== */
+@media (max-width: 768px) {
+  .footer-container,
+  .header-container,
+  .main-nav ul {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-column {
+    width: 100%;
+    margin-bottom: 1.5em;
+  }
+
+  .auth-links {
+    flex-direction: column;
+    gap: 0.25em;
+  }
+
+  .main-nav ul li {
+    margin: 0.5em 0;
+  }
+
+  .box {
+    padding: 1em;
+  }
+}

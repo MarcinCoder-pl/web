@@ -1,21 +1,28 @@
 <?php
 namespace Tools_Validation;
-
 use DateTime;
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+	}
+
 
 class InputValidator
 {
     // --- Stałe regex ---
-
+    
+    /** Regex do walidacji imienia i nazwiska: tylko litery (w tym polskie), spacje oraz myślniki */
     public const REGEX_NAME = '/^[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻż\s\-]{2,50}$/u';
-    public const REGEX_LOGIN = '/^[a-zA-Z0-9_]{3,20}$/';
-    public const REGEX_EMAIL = '/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/';
+
+    /** Regex do walidacji nazwy użytkownika: tylko litery, cyfry i podkreślenia */
+    public const REGEX_USERNAME = '/^[a-zA-Z0-9_]{3,20}$/';
+
+    /** Prosty regex dla e-maila */
+    public const REGEX_EMAIL = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/';
+
+    // --- Filtry i walidacja ---
 
     /**
-     * Oczyszcza ciąg znaków (usuwając tagi HTML i przycinając).
-     *
-     * @param string $input
-     * @return string
+     * Oczyszcza ciąg znaków (usuwa tagi i przycina białe znaki).
      */
     public static function sanitizeString(string $input): string
     {
@@ -23,48 +30,36 @@ class InputValidator
     }
 
     /**
-     * Oczyszcza i waliduje adres e-mail.
-     *
-     * @param string $input
-     * @return string|null
+     * Czyści i waliduje e-mail.
      */
     public static function sanitizeEmail(string $input): ?string
     {
         $email = filter_var(trim($input), FILTER_SANITIZE_EMAIL);
-        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ?: null;
     }
 
     /**
-     * Oczyszcza i waliduje liczbę całkowitą.
-     *
-     * @param mixed $input
-     * @return int|null
+     * Czyści i waliduje liczbę całkowitą.
      */
     public static function sanitizeInt($input): ?int
     {
-        $int = filter_var($input, FILTER_SANITIZE_NUMBER_INT);
-        return filter_var($int, FILTER_VALIDATE_INT) !== false ? (int)$int : null;
+        if (filter_var($input, FILTER_VALIDATE_INT) !== false) {
+            return (int) $input;
+        }
+        return null;
     }
 
     /**
-     * Oczyszcza i waliduje URL.
-     *
-     * @param string $input
-     * @return string|null
+     * Czyści i waliduje URL.
      */
     public static function sanitizeUrl(string $input): ?string
     {
-        $url = filter_var(trim($input), FILTER_SANITIZE_URL);
-        return filter_var($url, FILTER_VALIDATE_URL) ? $url : null;
+        $url = trim($input);
+        return filter_var($url, FILTER_VALIDATE_URL) ?: null;
     }
 
     /**
-     * Sprawdza, czy długość tekstu mieści się w zakresie.
-     *
-     * @param string $input
-     * @param int $min
-     * @param int $max
-     * @return bool
+     * Sprawdza długość tekstu.
      */
     public static function validateLength(string $input, int $min, int $max): bool
     {
@@ -73,23 +68,84 @@ class InputValidator
     }
 
     /**
-     * Sprawdza, czy pole nie jest puste (akceptuje "0").
-     *
-     * @param mixed $input
-     * @return bool
+     * Sprawdza, czy wartość jest podana (dozwolone "0").
      */
     public static function validateRequired($input): bool
     {
-        return !empty($input) || $input === '0';
+        return !(is_null($input) || $input === '' || (is_array($input) && empty($input)));
     }
 
     /**
-     * Sprawdza zgodność z wyrażeniem regularnym.
-     *
-     * @param string $input
-     * @param string $pattern
-     * @return bool
+     * Walidacja z użyciem regexu.
      */
     public static function validatePattern(string $input, string $pattern): bool
     {
-        return
+        return preg_match($pattern, $input) === 1;
+    }
+
+    /**
+     * Waliduje dane formularza na podstawie reguł.
+     */
+    public static function validateForm(array $data, array $rules): array
+    {
+        $errors = [];
+
+        foreach ($rules as $field => $ruleSet) {
+            $value = $data[$field] ?? null;
+
+            foreach ($ruleSet as $rule => $ruleValue) {
+                switch ($rule) {
+                    case 'required':
+                        if ($ruleValue && !self::validateRequired($value)) {
+                            $errors[$field][] = 'To pole jest wymagane.';
+                        }
+                        break;
+
+                    case 'min':
+                    case 'max':
+                        $min = $ruleSet['min'] ?? 0;
+                        $max = $ruleSet['max'] ?? PHP_INT_MAX;
+                        if (!self::validateLength((string)$value, $min, $max)) {
+                            $errors[$field][] = "Pole musi mieć od $min do $max znaków.";
+                        }
+                        break;
+
+                    case 'email':
+                        if ($ruleValue && self::sanitizeEmail($value) === null) {
+                            $errors[$field][] = 'Nieprawidłowy adres e-mail.';
+                        }
+                        break;
+
+                    case 'pattern':
+                        if (!self::validatePattern((string)$value, $ruleValue)) {
+                            $errors[$field][] = 'Nieprawidłowy format danych.';
+                        }
+                        break;
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Sprawdza poprawność daty względem formatu.
+     */
+    public static function validateDate(string $date, string $format = 'Y-m-d'): bool
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
+    }
+
+    /**
+     * Czyści tekst wieloliniowy:
+     * - usuwa HTML
+     * - usuwa nadmiar pustych linii (>2)
+     */
+    public static function sanitizeMultilineText(string $input): string
+    {
+        $input = strip_tags($input);
+        $input = preg_replace('/[\r\n]{3,}/', "\n\n", $input);
+        return trim($input);
+    }
+}

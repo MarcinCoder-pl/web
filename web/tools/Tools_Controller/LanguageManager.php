@@ -2,10 +2,15 @@
 namespace Tools_Controller;
 
 use Tools_Validation\FormValidator;
+use Tools_Manager\SessionManager;
+
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+}
 
 class LanguageManager
 {
-    private string $defaultLang = 'pl';
+    private string $defaultLang = 'cs';
     private array $allowedLangs = ['pl', 'en', 'cs'];
     private string $langDirectory;
     private string $currentLang;
@@ -16,23 +21,21 @@ class LanguageManager
         $this->langDirectory = rtrim($langDirectory, '/');
         $this->startSessionIfNeeded();
         $this->detectLanguage();
-        $this->loadLanguageFile();
+        $this->loadLanguageFiles();
     }
 
     private function startSessionIfNeeded(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            SessionManager::getInstance();
         }
     }
 
     private function detectLanguage(): void
     {
-        // Pobierz surowy input
         $input = ['lang' => $_GET['lang'] ?? ($_SESSION['lang'] ?? $this->defaultLang)];
 
-        // Waliduj i oczyść przy użyciu FormValidator
-        $validator = new \Tools_Validation\FormValidator();
+        $validator = new FormValidator();
         $validator->sanitize($input);
 
         $rules = [
@@ -44,11 +47,7 @@ class LanguageManager
 
         if ($validator->validate($rules)) {
             $lang = $validator->getSanitizedData()['lang'];
-            if (in_array($lang, $this->allowedLangs)) {
-                $_SESSION['lang'] = $lang;
-            } else {
-                $_SESSION['lang'] = $this->defaultLang;
-            }
+            $_SESSION['lang'] = in_array($lang, $this->allowedLangs) ? $lang : $this->defaultLang;
         } else {
             $_SESSION['lang'] = $this->defaultLang;
         }
@@ -56,13 +55,35 @@ class LanguageManager
         $this->currentLang = $_SESSION['lang'];
     }
 
-    private function loadLanguageFile(): void
+    private function loadLanguageFiles(): void
     {
-        $file = "{$this->langDirectory}/{$this->currentLang}.php";
-        if (file_exists($file)) {
-            $this->translations = include $file;
-        } else {
-            $this->translations = include "{$this->langDirectory}/{$this->defaultLang}.php";
+        $this->translations = []; // reset
+
+        $langPath = "{$this->langDirectory}/{$this->currentLang}";
+        $fallbackPath = "{$this->langDirectory}/{$this->defaultLang}";
+
+        $files = glob($langPath . "/*.php");
+
+        foreach ($files as $file) {
+            $loaded = include $file;
+            if (is_array($loaded)) {
+                $this->translations = array_merge($this->translations, $loaded);
+            }
+        }
+
+        // fallback: jeśli jakiś plik nie istnieje w wybranym języku, ładuj z domyślnego
+        if ($this->currentLang !== $this->defaultLang) {
+            $fallbackFiles = glob($fallbackPath . "/*.php");
+            foreach ($fallbackFiles as $fallbackFile) {
+                $filename = basename($fallbackFile);
+                $targetFile = $langPath . '/' . $filename;
+                if (!file_exists($targetFile)) {
+                    $loaded = include $fallbackFile;
+                    if (is_array($loaded)) {
+                        $this->translations = array_merge($this->translations, $loaded);
+                    }
+                }
+            }
         }
     }
 
@@ -76,7 +97,7 @@ class LanguageManager
         return $this->translations;
     }
 
-    public function translate(string $key): string
+    public function t(string $key): string
     {
         return $this->translations[$key] ?? $key;
     }

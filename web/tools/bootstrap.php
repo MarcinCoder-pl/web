@@ -1,25 +1,19 @@
 <?php
-// tools/bootstrap.php
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
+}
 
+// Autoloader dla klas z przestrzeni nazw
 spl_autoload_register(function ($className) {
-    $baseDir = dirname(__DIR__); // katalog główny projektu
+    $baseDir = __DIR__ . '/'; // katalog /tools/
 
-    // Zamień backslashe z namespace na slashe do folderów
+    // Zamień namespace na ścieżkę do pliku
     $relativePath = str_replace('\\', '/', $className) . '.php';
 
-    // Lista folderów, gdzie szukamy klas
-    $directories = [
-        '/includes/',
-        '/models/',
-        '/controllers/',
-        '/tools/',
-    ];
+    // Pełna ścieżka
+    $file = $baseDir . $relativePath;
 
-    foreach ($directories as $dir) {
-        $file = $baseDir . $dir . $relativePath;
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
+    if (file_exists($file)) {
+        require_once $file;
     }
 });

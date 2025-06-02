@@ -1,0 +1,13 @@
+main {
+  padding: 2em 1em;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: 'Roboto', sans-serif;
+}
+
+.box {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 2em;
+}
