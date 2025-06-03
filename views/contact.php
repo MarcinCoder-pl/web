@@ -1,54 +1,66 @@
 <?php
-if (!defined('ACCESS')) {
+if (!defined('ACCESS_DOOR')) {
     die('Brak dostępu.');
 }
 
-require_once __DIR__ . '/../config/db_config.php';
-require_once __DIR__ . '/../config/sql_queries.php';
 
-$slug = 'contact';
-$languageCode = $lang['language']; // np. 'pl', 'cs', 'en'
+use Tools_Manager\SessionManager;
 
-try {
-    $conn = new mysqli($db_host, $db_user, $db_password, $db_name);
-    $conn->set_charset('utf8mb4');
+$session = SessionManager::getInstance();
 
-    if (!defined('GET_POST_WEB_CONTACT')) {
-        throw new Exception("Stała GET_POST_BY_WEBSITE nie została zdefiniowana.");
-    }
+$csrfToken = $session->getOrCreateCsrfToken('send_message');
 
-    $stmt = $conn->prepare(GET_POST_WEB_CONTACT);
-    $stmt->bind_param("ss", $slug, $languageCode);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    ?>
+$errors = $session->get('form_errors') ?? [];
+$data = $session->get('form_data') ?? [];
+$success = $session->get('form_success') ?? '';
 
-    <div class="post-container">
-        <?php
-        if ($post = $result->fetch_assoc()) {
-            echo "<h1>" . htmlspecialchars($post['title']) . "</h1>";
-            echo "<p>" . nl2br(htmlspecialchars($post['content'])) . "</p>";
+$session->delete('form_errors');
+$session->delete('form_data');
+$session->delete('form_success');
+?>
+<?php if ($success): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+<?php endif; ?>
 
-            if (!empty($post['wsparcie'])) {
-                echo "<p><strong>" . htmlspecialchars($post['wsparcie']) . "</strong> <a href='mailto:example@example.com'>Napisz do nas</a> </p>";
-            }
-            if (!empty($post['partnerzy_media'])) {
-                echo "<p><strong>" . htmlspecialchars($post['partnerzy_media']) . "</strong> <a href='mailto:example@example.com'>Napisz do nas</a> </p>";
-            }
-            if (!empty($post['adres_korespondencyjny'])) {
-                echo "<p><strong>" . htmlspecialchars($post['adres_korespondencyjny']) . "</strong> </p>";
-            }
-        } else {
-            echo "<p>Nie znaleziono posta o slug: <strong>$slug</strong> w języku: <strong>$languageCode</strong>.</p>";
-        }
-        ?>
+<?php if (!empty($errors)): ?>
+    <div class="alert alert-danger">
+        <ul>
+            <?php foreach ($errors as $fieldErrors): ?>
+                <?php foreach ((array)$fieldErrors as $error): ?>
+                    <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php echo __DIR__; ?>
+
+<?php endif; ?>
+
+<div class="contact-container">
+    <div class="contact-form-section">
+        <h2><?= $languageManager->t('contact_us') ?></h2>
+        <form action="../tools/Tools_Message/send_message.php" method="post">
+            <div class="form-group">
+                <label for="name"><?= $languageManager->t('full_name') ?></label>
+                <input type="text" id="name" name="name" required minlength="2" maxlength="100" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="email"><?= $languageManager->t('email_address') ?></label>
+                <input type="email" id="email" name="email" required maxlength="150" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="message"><?= $languageManager->t('message') ?></label>
+                <textarea id="message" name="message" rows="10" required maxlength="2000" class="form-control"></textarea>
+            </div>
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>" />
+            <button type="submit" class="btn-submit"><?= $languageManager->t('send_from') ?></button>
+        </form>
     </div>
 
-    <?php
-    $stmt->close();
-    $conn->close();
-
-} catch (Exception $e) {
-    echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
-}
-?>
+    <div class="contact-info-section">
+        <h3><?= $languageManager->t('contact_details') ?></h3>
+        <p><?= $languageManager->t('contact_address') ?>: ul. Przykładowa 123<br />00-000 Miasto</p>
+        <p><?= $languageManager->t('contact_phone') ?>: <a href="tel:+48123456789">+48 123 456 789</a></p>
+        <p><?= $languageManager->t('contact_email') ?>: <a href="mailto:kontakt@example.com">kontakt@example.com</a></p>
+    </div>
+</div>

@@ -1,34 +1,35 @@
 <?php
-if (!defined('ACCESS')) {
-    die('Brak dostępu do formularza rejestracji.');
-}
-require_once __DIR__ . '/../tools/csrf_token.php';
+use Tools_Manager\SessionManager;
+
+$session = SessionManager::getInstance();
+$csrfToken = $session->getOrCreateCsrfToken('register');
 ?>
-<div class="post-container">
-    <h2>Rejestracja</h2>
-		<form method="post" action="/../tools/register_user.php">
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-
-	<div>
-		<label for="username">Login:</label><br>
-		<input type="text" name="username" required>
-	</div>			
-	
-	<div>			
-		<label for="password">Hasło:</label><br>
-		<input type="password" name="password" required autocomplete="off">	
-	<div>
-
-	<div>
-		<label for="password_confirm">Potwierdź hasło:</label><br>
-        <input type="password" name="password_confirm" required>	
-	</div>
 
 
-        <br><button type="submit" name="register" value="rejestruj">Zarejestruj się</button>
+    <h2>Formularz rejestracyjny</h2>
+
+    <?php if ($session->has('register_error')): ?>
+        <div style="color: red;"><?php echo $session->get('register_error'); $session->delete('register_error'); ?></div>
+    <?php endif; ?>
+
+    <form action="tools/user_core/user_register.php" method="post">
+
+        <label>Login:<br>
+            <input type="text" name="username" required>
+        </label><br><br>
+        
+        <label for="email">Email:</label>
+		<input type="email" name="email" id="email" required>
+
+        <label>Hasło:<br>
+            <input type="password" name="password" required>
+        </label><br><br>
+
+        <label>Powtórz hasło:<br>
+            <input type="password" name="confirm_password" required>
+        </label><br><br>
+
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+        <input type="submit" value="Zarejestruj się">
+        
     </form>
-    <?php if (isset($_SESSION['error'])): ?>
-    <div class="error-message"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
-<?php endif; ?>
-
-</div>

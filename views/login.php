@@ -1,24 +1,32 @@
 <?php
-if (!defined('ACCESS')) {
-    die('Brak dostępu do formularza logowania.');
+use Tools_Manager\SessionManager;
+if (!defined('ACCESS_DOOR')) {
+    die('Brak dostępu.');
 }
-if(isset($_SESSION['username']) )
-{
-	header('Location: home.php');
-}
-require_once __DIR__ . '/../tools/csrf_token.php';
-?>
-<div class="post-container">
-    <h2>Logowanie</h2>
-    <form method="post" action="../tools/login_user.php">
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
 
-        <label for="username">Login:</label>
-        <input type="text" name="username" required>
+$session = SessionManager::getInstance();
+$csrfToken = $session->getOrCreateCsrfToken('login');
+?>
+ <h2>Logowanie</h2>
+
+    <?php if ($session->has('login_error')): ?>
+        <div style="color: red;"><?php echo htmlspecialchars($session->get('login_error')); ?></div>
+        <?php $session->delete('login_error'); ?>
+    <?php endif; ?>
+
+    <form action="tools/user_core/user_login.php" method="post">
+
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
+
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" name="username" required>
+
+        <br>
 
         <label for="password">Hasło:</label>
-        <input type="password" name="password" required autocomplete="off">
+        <input type="password" id="password" name="password" required>
 
-        <button type="submit" name="login" value="loguj">Zaloguj się</button>
+        <br>
+
+        <button type="submit">Zaloguj się</button>
     </form>
-</div>

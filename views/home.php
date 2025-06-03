@@ -1,46 +1,22 @@
-<?php
-// Zabezpieczenie dostępu
-if (!defined('ACCESS')) {
-    die('Brak dostępu.');
-}
-// Ładowanie konfiguracji
-require_once __DIR__ . '/../config/db_config.php';
-require_once __DIR__ . '/../config/sql_queries.php';
-require_once __DIR__ . '/../config/database.php';
+<div class="home-container">
+    <section class="hero">
+        <h1><?= $languageManager->t('home_welcome_title') ?></h1>
+        <p><?= $languageManager->t('home_welcome_subtitle') ?></p>
+        <a class="home-cta" href="/?page=register.php"><?= $languageManager->t('home_get_started') ?></a>
+    </section>
 
-// Dane wejściowe
-$slug = 'welcome';
-$languageCode = $lang['language'];
-
-try {
-    $db = new Database($db_host, $db_user, $db_password, $db_name);
-
-    // Dynamiczne zapytanie
-    if (!defined('GET_POST_WEB_DOWNLOAD')) {
-        throw new Exception("Zapytanie GET_POST_BY_SLUG_AND_LANG nie zostało zdefiniowane.");
-    }
-
-    $result = $db->query(GET_POST_WEB_DOWNLOAD, "ss", [$slug, $languageCode]);
-    ?>
-
-    <div class="post-container">
-        <?php if ($post = $result->fetch_assoc()): ?>
-            <h1><?= htmlspecialchars($post['title']) ?></h1>
-            <div class="download-button-wrapper">
-                <a href="files/game_installer_windows.exe" class="download-button" download>
-                    ⬇️ Download Game for Windows
-                </a>
-            </div>
-            <div><?= nl2br(htmlspecialchars($post['content'])) ?></div><a href="#">a</a>
-        <?php else: ?>
-            <p>Nie znaleziono posta o slug: <strong><?= htmlspecialchars($slug) ?></strong>
-            w języku: <strong><?= htmlspecialchars($languageCode) ?></strong>.</p>
-        <?php endif; ?>
-    </div>
-
-    <?php
-    $db->close();
-} catch (Exception $e) {
-    echo "<p style='color:red;'>Błąd: " . htmlspecialchars($e->getMessage()) . "</p>";
-}
-?>
+    <section class="features">
+        <div class="feature">
+            <h2><?= $languageManager->t('home_feature_one_title') ?></h2>
+            <p><?= $languageManager->t('home_feature_one_desc') ?></p>
+        </div>
+        <div class="feature">
+            <h2><?= $languageManager->t('home_feature_two_title') ?></h2>
+            <p><?= $languageManager->t('home_feature_two_desc') ?></p>
+        </div>
+        <div class="feature">
+            <h2><?= $languageManager->t('home_feature_three_title') ?></h2>
+            <p><?= $languageManager->t('home_feature_three_desc') ?></p>
+        </div>
+    </section>
+</div>

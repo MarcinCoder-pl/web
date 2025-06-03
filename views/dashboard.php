@@ -1,21 +1,23 @@
 <?php
-    //W pliku, który chcesz chronić, dodaj na górze coś takiego:
-    if (!defined('ACCESS')) {
-    die('Brak dostępu.');
-	}
-	require_once __DIR__ . '/../tools/csrf_token.php';
-	
-if (!isset($_SESSION['username'])) {
-    // Jeśli nie, przekierowanie na stronę logowania
-    header('Location: home.php');
+use Tools_Manager\SessionManager;
+
+$session = SessionManager::getInstance();
+
+if (!$session->isLoggedIn()) {
+    header('Location: /?page=login');
     exit;
-}	
+}
+
+$userId = $session->get('user_id');
+$username = $session->get('username'); // Zakładamy, że zapisałeś nazwę użytkownika w sesji po zalogowaniu/rejestracji
 ?>
-<div class="post-container">
-<BR>dashboard
-</div>
-<!-- Formularz wylogowywania z tokenem CSRF -->
-<form method="post" action="../tools/logout.php">
-    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>" >
-    <button type="submit" name="logout" value="logout">Wyloguj się</button>
-</form>
+
+<h2>Witaj w panelu użytkownika</h2>
+
+<p>Cześć, <strong><?= htmlspecialchars($username ?? 'Użytkowniku') ?></strong>! Miło Cię widzieć.</p>
+
+<ul>
+    <li><a href="/?page=profile">Twój profil</a></li>
+    <li><a href="/?page=settings">Ustawienia konta</a></li>
+    <li><a href="/../tools/user_core/user_logout.php">Wyloguj się</a></li>
+</ul>

@@ -1,12 +1,33 @@
-<?php 
-// Sprawdzamy, czy sesja jest już uruchomiona
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-define('ACCESS', true);
-$page = isset($_GET['strona']) ? $_GET['strona'] : 'home';
+<?php
+header("Referrer-Policy: strict-origin-when-cross-origin");
 
-require_once 'includes/init_html.php';  // Zaczyna nagłówek HTML
-require_once 'includes/body_wrapper.php';       // Zawartość strony
+use Tools_Manager\SessionManager;
+use Tools_Controller\SimplePageRouter;
+use Tools_Controller\LanguageManager;
 
-?>
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+define('ACCESS_DOOR', true);
+
+// Ładowanie klas
+require_once __DIR__ . '/tools/bootstrap.php';
+
+// Inicjalizacja menedżera języków
+$languageManager = new LanguageManager(__DIR__ . '/lang');
+$translations = $languageManager->getTranslations();
+
+// Inicjalizacja sesji i ustawienie tłumaczeń
+$session = SessionManager::getInstance();
+$session->set($translations);
+
+// Routing widoku
+$viewsPath = __DIR__ . '/views';
+$route = new SimplePageRouter($viewsPath, $languageManager);
+
+// Aktualny język
+$currentLang = $languageManager->getCurrentLang();
+
+// Ładowanie HTML
+require_once __DIR__ . '/includes/init_html.php';
