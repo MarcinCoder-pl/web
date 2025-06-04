@@ -1,4 +1,5 @@
 <?php
+
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
 use Tools_Manager\SessionManager;
@@ -13,6 +14,8 @@ define('ACCESS_DOOR', true);
 
 // Ładowanie klas
 require_once __DIR__ . '/tools/bootstrap.php';
+
+require_once __DIR__ . '/tools/cookie-consent.php'; // RODO
 
 // Inicjalizacja menedżera języków
 $languageManager = new LanguageManager(__DIR__ . '/lang');

@@ -1,0 +1,21 @@
+.privacy-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.privacy-container h1,
+.privacy-container h2,
+.privacy-container h3 {
+    color: #2a4d69;
+}
+
+.privacy-container ul {
+    list-style: disc;
+    margin-left: 1.5rem;
+}

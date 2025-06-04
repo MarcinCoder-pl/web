@@ -32,10 +32,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Style 
+  <!-- Style -->
 	<link rel="stylesheet" href="/style/main.css">
-	-->
 	
+	<!--
 	<link rel="stylesheet" href="/style/init_css.css">
 
 	<link rel="stylesheet" href="/style/aside.css">
@@ -46,6 +46,9 @@
 	<link rel="stylesheet" href="/style/download.css">
 	<link rel="stylesheet" href="/style/contact.css">
 	<link rel="stylesheet" href="/style/home.css">
+	<link rel="stylesheet" href="/style/register.css">
+	<link rel="stylesheet" href="/style/showCookieBanner.css">
+	-->
 
 
 

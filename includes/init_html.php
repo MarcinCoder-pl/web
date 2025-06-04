@@ -18,5 +18,6 @@ if (!defined('ACCESS_DOOR')) {
 		<?php include_once __DIR__ . '/main.php'; ?>
 
 		<?php include_once __DIR__ . '/footer.php'; ?>
+		<?php include_once __DIR__ . '/../tools/showCookieBanner.php'; ?>
 	</body>
 </html>

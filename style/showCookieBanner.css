@@ -1,0 +1,36 @@
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #111;
+    color: #fff;
+    padding: 1em;
+    z-index: 9999;
+    font-size: 0.9em;
+}
+
+.cookie-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.cookie-text {
+    flex: 1;
+}
+
+.cookie-link {
+    color: #ccc;
+    text-decoration: underline;
+}
+
+.cookie-accept-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    margin-left: 1em;
+    cursor: pointer;
+}

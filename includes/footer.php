@@ -37,9 +37,10 @@
     <div class="footer-column">
       <h3><?= $languageManager->t('support'); ?></h3>
       <ul>
-        <li><a href="/?page=help"><?= $languageManager->t('help_center'); ?></a></li>
-        <li><a href="/?page=report-bug"><?= $languageManager->t('report_bug'); ?></a></li>
+        <li><a href="/?page=help_center"><?= $languageManager->t('help_center'); ?></a></li>
+        <li><a href="/?page=report_bug"><?= $languageManager->t('report_bug'); ?></a></li>
         <li><a href="/?page=contact"><?= $languageManager->t('contact_us'); ?></a></li>
+        <li><a href="/?page=privacy"><?= $languageManager->t('privacy'); ?></a></li>
       </ul>
     </div>
 
