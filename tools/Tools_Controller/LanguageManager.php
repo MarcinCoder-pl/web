@@ -55,38 +55,28 @@ class LanguageManager
         $this->currentLang = $_SESSION['lang'];
     }
 
-    private function loadLanguageFiles(): void
-    {
-        $this->translations = []; // reset
+private function loadLanguageFiles(): void
+{
+    $this->translations = [];
 
-        $langPath = "{$this->langDirectory}/{$this->currentLang}";
-        $fallbackPath = "{$this->langDirectory}/{$this->defaultLang}";
+    $langFile = "{$this->langDirectory}/{$this->currentLang}.json";
+    $fallbackFile = "{$this->langDirectory}/{$this->defaultLang}.json";
 
-        $files = glob($langPath . "/*.php");
-
-        foreach ($files as $file) {
-            $loaded = include $file;
-            if (is_array($loaded)) {
-                $this->translations = array_merge($this->translations, $loaded);
-            }
-        }
-
-        // fallback: jeśli jakiś plik nie istnieje w wybranym języku, ładuj z domyślnego
-        if ($this->currentLang !== $this->defaultLang) {
-            $fallbackFiles = glob($fallbackPath . "/*.php");
-            foreach ($fallbackFiles as $fallbackFile) {
-                $filename = basename($fallbackFile);
-                $targetFile = $langPath . '/' . $filename;
-                if (!file_exists($targetFile)) {
-                    $loaded = include $fallbackFile;
-                    if (is_array($loaded)) {
-                        $this->translations = array_merge($this->translations, $loaded);
-                    }
-                }
-            }
-        }
+    if (file_exists($langFile)) {
+        $json = file_get_contents($langFile);
+        $this->translations = json_decode($json, true) ?? [];
     }
 
+    // fallback dla brakujących kluczy
+    if ($this->currentLang !== $this->defaultLang && file_exists($fallbackFile)) {
+        $fallbackJson = file_get_contents($fallbackFile);
+        $fallbackTranslations = json_decode($fallbackJson, true) ?? [];
+
+        $this->translations = array_merge($fallbackTranslations, $this->translations);
+    }
+}
+
+///
     public function getCurrentLang(): string
     {
         return $this->currentLang;

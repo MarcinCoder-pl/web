@@ -160,7 +160,8 @@ public function login(int|string $userId, string $username = ''): void
         $_SESSION['session_ua_check'] = $this->isCli() ? 'CLI' : ($_SERVER['HTTP_USER_AGENT'] ?? '');
     }
 
-    public function resetSessionIfInvalid(): void {
+    public function resetSessionIfInvalid(): void 
+    {
         $currentIp = $this->isCli() ? '127.0.0.1' : ($_SERVER['REMOTE_ADDR'] ?? '');
         $currentUa = $this->isCli() ? 'CLI' : ($_SERVER['HTTP_USER_AGENT'] ?? '');
 
@@ -168,9 +169,29 @@ public function login(int|string $userId, string $username = ''): void
         $ipMatch = isset($_SESSION['session_ip_check']) && $_SESSION['session_ip_check'] === $currentIp;
         $uaMatch = isset($_SESSION['session_ua_check']) && $_SESSION['session_ua_check'] === $currentUa;
 
-        if (!$idMatch || !$ipMatch || !$uaMatch) {
+        if (!$idMatch || !$ipMatch || !$uaMatch) 
+        {
             $this->logout();
             $this->start();
         }
     }
+    
+    /**
+     * Zwraca pełną zawartość sesji – do wglądu użytkownika (RODO)
+     */
+    public function exportSessionData(): array {
+        return $_SESSION;
+    }
+
+    /**
+     * Usuwa wszystkie dane z sesji i kończy sesję – "prawo do bycia zapomnianym"
+     */
+    public function deleteSessionData(): void {
+        $_SESSION = [];
+        session_destroy();
+        session_write_close();
+    }
+
+    
+    
 }
