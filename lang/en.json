@@ -106,5 +106,27 @@
   "title": "Welcome to our website!",
   "hello": "Hello",
   "choose_language": "Choose language:",
-  "logout": "Logout"
+  "logout": "Logout",
+
+  "login_page": "Logowanie",
+  "login_user_page": "Username:",
+  "login_password_page": "Password", 
+  "login_button_page": "Log in",
+
+  "username": "Username",
+  "email": "Email",
+  "password": "Password",
+  "confirm_password": "Confirm password",
+  "register_button": "Register",
+
+  "login_error_invalid_csrf": "Invalid CSRF token.",
+  "login_error_invalid_credentials": "Invalid username or password.",
+  "login_error_account_inactive": "The account is inactive.",
+  "login_error_system": "System error: {error_message}",
+  "login_validation_username_required": "The username field is required.",
+  "login_validation_username_min": "The username must be at least 3 characters long.",
+  "login_validation_username_max": "The username may not exceed 255 characters.",
+  "login_validation_password_required": "The password field is required.",
+  "login_validation_password_min": "The password must be at least 6 characters long.",
+  "login_validation_password_max": "The password may not exceed 255 characters."
 }

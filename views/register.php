@@ -14,23 +14,25 @@ $csrfToken = $session->getOrCreateCsrfToken('register');
     <?php endif; ?>
 
     <form action="tools/user_core/user_register.php" method="post">
-        <label>Login:<br>
+        <label>
+            <?= $languageManager->t('username') ?>
+        <br>
             <input type="text" name="username" required>
         </label><br><br>
 
-        <label for="email">Email:</label>
+        <label for="email"><?= $languageManager->t('email') ?></label>
         <input type="email" name="email" id="email" required><br><br>
 
-        <label>Hasło:<br>
+        <label><?= $languageManager->t('password') ?> <br>
             <input type="password" name="password" required>
         </label><br><br>
 
-        <label>Powtórz hasło:<br>
+        <label><?= $languageManager->t('confirm_password') ?><br>
             <input type="password" name="confirm_password" required>
         </label><br><br>
 
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-        <input type="submit" value="Zarejestruj się">
+        <input type="submit" value="<?= $languageManager->t('register_button') ?>">
     </form>
 </div>
 

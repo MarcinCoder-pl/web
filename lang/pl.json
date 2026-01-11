@@ -68,7 +68,7 @@
   "help_contact_instruction": "Skontaktuj się z nami przez formularz kontaktowy lub napisz na pomoc@twojastrona.pl",
 
   "getting_started": "Zacznij tutaj",
-  "download_game": "Pobierz grę",
+  "download_game": "Pobierz Grę",
   "how_to_play": "Jak grać",
   "resources": "Zasoby",
   "game_wiki": "Wiki gry",
@@ -106,5 +106,27 @@
   "title": "Witamy na naszej stronie!",
   "hello": "Witaj",
   "choose_language": "Wybierz język:",
-  "logout": "Wyloguj"
+  "logout": "Wyloguj",
+
+  "login_page": "Logowanie",
+  "login_user_page": "Nazwa użytkownika:",
+  "login_password_page": "Hasło",
+  "login_button_page": "Zaloguj się",
+  
+  "username": "Nazwa użytkownika",
+  "email": "Email",
+  "password": "Hasło",
+  "confirm_password": "Powtórz hasło",
+  "register_button": "Zarejestruj się",
+
+  "login_error_invalid_csrf": "Nieprawidłowy token CSRF.",
+  "login_error_invalid_credentials": "Nieprawidłowy login lub hasło.",
+  "login_error_account_inactive": "Konto jest nieaktywne.",
+  "login_error_system": "Błąd systemu: {error_message}",
+  "login_validation_username_required": "Pole nazwa użytkownika jest wymagane.",
+  "login_validation_username_min": "Pole nazwa użytkownika musi mieć co najmniej 3 znaki.",
+  "login_validation_username_max": "Pole nazwa użytkownika może mieć maksymalnie 255 znaków.",
+  "login_validation_password_required": "Pole hasło jest wymagane.",
+  "login_validation_password_min": "Pole hasło musi mieć co najmniej 6 znaków.",
+  "login_validation_password_max": "Pole hasło może mieć maksymalnie 255 znaków."
 }

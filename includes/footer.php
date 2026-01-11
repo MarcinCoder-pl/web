@@ -7,7 +7,7 @@
     <div class="footer-column">
       <h3><?= $languageManager->t('getting_started'); ?></h3>
       <ul>
-        <li><a href="/?page=download"><?= $languageManager->t('download'); ?></a></li>
+        <li><a href="/?page=download"><?= $languageManager->t('download_game'); ?></a></li>
         <li><a href="/?page=register"><?= $languageManager->t('create_account'); ?></a></li>
         <!-- <li><a href="/?page=how-to-play.php"> <?= $languageManager->t('how_to_play'); ?></a></li> -->
       </ul>
