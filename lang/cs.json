@@ -113,7 +113,7 @@
   "login_password_page": "Heslo",
   "login_button_page": "Přihlásit se",
 
-  "username": "Uživatelské jméno",
+  "username_login": "Uživatelské jméno",
   "email": "Email",
   "password": "Heslo",
   "confirm_password": "Potvrdit heslo",

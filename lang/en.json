@@ -113,7 +113,7 @@
   "login_password_page": "Password", 
   "login_button_page": "Log in",
 
-  "username": "Username",
+  "username_login": "Username",
   "email": "Email",
   "password": "Password",
   "confirm_password": "Confirm password",

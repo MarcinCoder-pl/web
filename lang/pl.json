@@ -113,7 +113,7 @@
   "login_password_page": "Hasło",
   "login_button_page": "Zaloguj się",
   
-  "username": "Nazwa użytkownika",
+  "username_login": "Nazwa użytkownika",
   "email": "Email",
   "password": "Hasło",
   "confirm_password": "Powtórz hasło",
